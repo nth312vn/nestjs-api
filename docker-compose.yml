@@ -1,0 +1,13 @@
+version: '1.0' # Specify the Docker Compose version
+
+services:
+  db:
+    image: postgres:latest # Use the official PostgreSQL image with Alpine Linux base
+    restart: always # Restart the container automatically if it stops
+    environment:
+      - POSTGRES_USER = postgres # Set the username for the database
+      - POSTGRES_PASSWORD = postgres # Set the password for the database (replace with a strong password)
+      - POSTGRES_DB = mydatabase # Set the name of the database
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - '5432:5432' # Map the container's port 5432 (default for PostgreSQL) to the host's port 5432
