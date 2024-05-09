@@ -1,11 +1,13 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
-  JoinTable,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { UserRoles } from './userRole.entity';
+import { Token } from './token.entity';
 
 @Entity()
 export class Users {
@@ -21,7 +23,13 @@ export class Users {
   firstName: string;
   @Column({ length: 50 })
   lastName: string;
+
   @OneToMany(() => UserRoles, (UserRoles) => UserRoles.user)
-  @JoinTable()
-  role: UserRoles[];
+  userRoles: UserRoles[];
+  @OneToMany(() => Token, (token) => token.user)
+  tokens: Token[];
+  @CreateDateColumn()
+  created_at: Date;
+  @UpdateDateColumn()
+  updated_at: Date;
 }

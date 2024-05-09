@@ -1,5 +1,9 @@
 import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { Roles } from 'src/entity/role.entity';
+import { Token } from 'src/entity/token.entity';
+import { Users } from 'src/entity/user.entity';
+import { UserRoles } from 'src/entity/userRole.entity';
 
 export default registerAs(
   'database',
@@ -10,7 +14,7 @@ export default registerAs(
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
-    entities: [],
+    entities: [Users, Roles, UserRoles, Token],
     synchronize: true,
   }),
 );
