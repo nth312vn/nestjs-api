@@ -15,7 +15,6 @@ export class Users {
   id: number;
   @Column({ length: 20, unique: true })
   userName: string;
-  @Column({ length: 100 })
   passwordHashed: string;
   @Column({ length: 50, unique: true })
   email: string;
