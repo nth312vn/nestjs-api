@@ -18,8 +18,7 @@ export class Token {
   user: Users;
   @Column()
   token: string;
-  @Column()
-  date: Date;
+
   @CreateDateColumn()
   created_at: Date;
   @UpdateDateColumn()

@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import databaseConfig from './core/config/database.config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { RoleModule } from './role/role.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -12,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
     TypeOrmModule.forRoot(databaseConfig()),
     UserModule,
     AuthModule,
+    RoleModule,
   ],
   controllers: [],
   providers: [],

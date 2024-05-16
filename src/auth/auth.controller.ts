@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { routeName } from 'src/core/config/routeName';
-import { RegisterDto } from './dto/auth.dto';
+import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { successMessage } from 'src/core/message/successMessage';
 
@@ -11,9 +11,22 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() registerDto: RegisterDto) {
     try {
-      await this.register(registerDto);
+      await this.authService.register(registerDto);
       return {
         message: successMessage.userHadBeenCreated,
+      };
+    } catch (err) {
+      throw err;
+    }
+  }
+  @Post(routeName.login)
+  async login(@Body() loginDto: LoginDto) {
+    try {
+      const { accessToken, refreshToken } =
+        await this.authService.login(loginDto);
+      return {
+        accessToken,
+        refreshToken,
       };
     } catch (err) {
       throw err;

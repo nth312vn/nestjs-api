@@ -12,4 +12,7 @@ export class PasswordService {
       this.configService.get(envKey.SALT_ROUND) || defaultConfig.saltRound,
     );
   }
+  isMatchPassword(password: string, hashedPassword: string) {
+    return bcrypt.compare(password, hashedPassword);
+  }
 }

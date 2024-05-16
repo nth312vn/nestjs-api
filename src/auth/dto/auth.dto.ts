@@ -17,4 +17,15 @@ export class RegisterDto {
   @IsNotEmpty()
   @MaxLength(50)
   lastName: string;
+  @IsNotEmpty()
+  @MaxLength(50)
+  role: string;
+}
+export class LoginDto {
+  @IsNotEmpty()
+  @MaxLength(20)
+  userName: string;
+  @IsNotEmpty()
+  @MaxLength(20)
+  password: string;
 }
