@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { LoginDto, RegisterDto } from './dto/auth.dto';
+import { LoginDto, LogoutDto, RegisterDto } from './dto/auth.dto';
 import { exceptionMessage } from 'src/core/message/exceptionMessage';
 import { UserService } from 'src/user/user.service';
 import { PasswordService } from './password/password.service';
@@ -76,6 +76,25 @@ export class AuthService {
         accessToken,
         refreshToken,
       };
+    } catch (err) {
+      throw err;
+    }
+  }
+  async logout(logoutDto: LogoutDto) {
+    try {
+      const { userName, refreshToken } = logoutDto;
+      const user = await this.userService.isExistUser(userName);
+      if (!user) {
+        throw new NotFoundException(exceptionMessage.userIsNotFound);
+      }
+      const tokenInfo = await this.tokenService.getRefreshTokenInfo(
+        user.id,
+        refreshToken,
+      );
+      if (!tokenInfo) {
+        throw new NotFoundException(exceptionMessage.refreshTokenIsNotFound);
+      }
+      await this.tokenService.deleteRefreshToken(tokenInfo.id);
     } catch (err) {
       throw err;
     }

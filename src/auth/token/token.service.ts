@@ -36,4 +36,15 @@ export class TokenService extends BaseService<Token> {
         defaultConfig.refreshTokenExpireTime,
     });
   }
+  deleteRefreshToken(id: number) {
+    return this.deleteById(id);
+  }
+  getRefreshTokenInfo(userId: number, token: string) {
+    return this.getOneByOptions({
+      where: {
+        token,
+        userId,
+      },
+    });
+  }
 }

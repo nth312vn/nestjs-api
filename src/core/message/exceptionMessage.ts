@@ -3,4 +3,5 @@ export const exceptionMessage = {
   roleIsNotValid: 'Role is not valid',
   userIsNotFound: 'User is not found',
   invalidPassword: 'Invalid password',
+  refreshTokenIsNotFound: 'refresh token is not found',
 };

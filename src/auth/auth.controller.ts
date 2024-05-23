@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { routeName } from 'src/core/config/routeName';
-import { LoginDto, RegisterDto } from './dto/auth.dto';
+import { LoginDto, LogoutDto, RegisterDto } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { successMessage } from 'src/core/message/successMessage';
 
@@ -27,6 +27,17 @@ export class AuthController {
       return {
         accessToken,
         refreshToken,
+      };
+    } catch (err) {
+      throw err;
+    }
+  }
+  @Post(routeName.logout)
+  async logout(@Body() logoutDto: LogoutDto) {
+    try {
+      await this.logout(logoutDto);
+      return {
+        message: successMessage.logoutSuccess,
       };
     } catch (err) {
       throw err;

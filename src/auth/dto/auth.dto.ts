@@ -29,3 +29,10 @@ export class LoginDto {
   @MaxLength(20)
   password: string;
 }
+export class LogoutDto {
+  @IsNotEmpty()
+  refreshToken: string;
+  @IsNotEmpty()
+  @MaxLength(20)
+  userName: string;
+}
