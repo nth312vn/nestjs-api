@@ -11,8 +11,8 @@ import { Token } from './token.entity';
 
 @Entity()
 export class Users {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
   @Column({ length: 20, unique: true })
   userName: string;
   @Column()

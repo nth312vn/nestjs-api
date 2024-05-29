@@ -11,8 +11,8 @@ import { Users } from './user.entity';
 
 @Entity()
 export class Token {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
   @ManyToOne(() => Users, (user) => user.tokens)
   @JoinColumn({ name: 'userId' })
   user: Users;
