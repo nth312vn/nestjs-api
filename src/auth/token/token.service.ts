@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BaseService } from 'src/core/base/baseService';
 import { defaultConfig } from 'src/core/config/defaultConfig';
 import { envKey } from 'src/core/config/envKey';
-import { Token } from 'src/entity/token.entity';
+import { Token } from 'src/entity/deviceSession.entity';
 import { Users } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
 import {

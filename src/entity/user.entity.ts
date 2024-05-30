@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRoles } from './userRole.entity';
-import { Token } from './token.entity';
+import { Token } from './deviceSession.entity';
 
 @Entity()
 export class Users {

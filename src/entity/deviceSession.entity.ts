@@ -17,8 +17,13 @@ export class Token {
   @JoinColumn({ name: 'userId' })
   user: Users;
   @Column()
-  token: string;
-
+  device_id: string;
+  @Column()
+  user_agent: string;
+  @Column()
+  refresh_token: string;
+  @Column()
+  ip_address: string;
   @CreateDateColumn()
   created_at: Date;
   @UpdateDateColumn()

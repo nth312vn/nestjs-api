@@ -1,7 +1,7 @@
 import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Roles } from 'src/entity/role.entity';
-import { Token } from 'src/entity/token.entity';
+import { Token } from 'src/entity/deviceSession.entity';
 import { Users } from 'src/entity/user.entity';
 import { UserRoles } from 'src/entity/userRole.entity';
 
