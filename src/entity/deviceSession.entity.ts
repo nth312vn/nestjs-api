@@ -9,19 +9,17 @@ import {
 } from 'typeorm';
 import { Users } from './user.entity';
 
-@Entity()
-export class Token {
+@Entity('device_session')
+export class DeviceSession {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @ManyToOne(() => Users, (user) => user.tokens)
+  @ManyToOne(() => Users, (user) => user.id)
   @JoinColumn({ name: 'userId' })
   user: Users;
   @Column()
   device_id: string;
   @Column()
   user_agent: string;
-  @Column()
-  refresh_token: string;
   @Column()
   ip_address: string;
   @CreateDateColumn()

@@ -1,7 +1,7 @@
 import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { DeviceSession } from 'src/entity/deviceSession.entity';
 import { Roles } from 'src/entity/role.entity';
-import { Token } from 'src/entity/deviceSession.entity';
 import { Users } from 'src/entity/user.entity';
 import { UserRoles } from 'src/entity/userRole.entity';
 
@@ -14,7 +14,7 @@ export default registerAs(
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
-    entities: [Users, Roles, UserRoles, Token],
+    entities: [Users, Roles, UserRoles, DeviceSession],
     synchronize: true,
   }),
 );

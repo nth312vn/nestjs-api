@@ -59,7 +59,7 @@ export class BaseService<T> {
       throw new BadGatewayException(e.message);
     }
   }
-  async deleteById(id: number) {
+  async deleteById(id: string) {
     try {
       return this.genericRepository.delete(id);
     } catch (e) {

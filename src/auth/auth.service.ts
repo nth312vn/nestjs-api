@@ -13,6 +13,8 @@ import { Repository } from 'typeorm';
 import { UserRoles } from 'src/entity/userRole.entity';
 import { RoleService } from 'src/role/role.service';
 import { TokenService } from './token/token.service';
+import { LoginMetaData } from './interface/auth.interface';
+import { DeviceSessionService } from './deviceSession/deviceSession.service';
 
 @Injectable()
 export class AuthService {
@@ -23,12 +25,13 @@ export class AuthService {
     private userRoleRepository: Repository<UserRoles>,
     private roleService: RoleService,
     private tokenService: TokenService,
+    private deviceSessionService: DeviceSessionService,
   ) {}
   async register(registerDto: RegisterDto) {
     try {
       const { userName, password, email, firstName, lastName, role } =
         registerDto;
-      const isExistUser = await this.userService.isExistUser(userName);
+      const isExistUser = await this.userService.getUserInfo(userName);
       if (isExistUser) {
         throw new ConflictException(exceptionMessage.userAlreadyExist);
       }
@@ -53,9 +56,9 @@ export class AuthService {
       throw err;
     }
   }
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto, metaData: LoginMetaData) {
     try {
-      const user = await this.userService.isExistUser(loginDto.userName);
+      const user = await this.userService.getUserInfo(loginDto.userName);
       if (!user) {
         throw new NotFoundException(exceptionMessage.userIsNotFound);
       }
@@ -71,7 +74,7 @@ export class AuthService {
         this.tokenService.generateAccessToken({ id, userName, email }),
         this.tokenService.generateRefreshToken({ id, userName }),
       ]);
-      await this.tokenService.saveRefreshToken(user, refreshToken);
+      await this.deviceSessionService.saveDeviceSession(metaData, user);
       return {
         accessToken,
         refreshToken,
@@ -83,7 +86,7 @@ export class AuthService {
   async logout(logoutDto: LogoutDto) {
     try {
       const { userName, refreshToken } = logoutDto;
-      const user = await this.userService.isExistUser(userName);
+      const user = await this.userService.getUserInfo(userName);
       if (!user) {
         throw new NotFoundException(exceptionMessage.userIsNotFound);
       }

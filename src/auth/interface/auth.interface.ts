@@ -1,9 +1,14 @@
 export interface AccessTokenPayload {
-  id: number;
+  id: string;
   email: string;
   userName: string;
 }
 export interface RefreshTokenPayload {
-  id: number;
+  id: string;
   userName: string;
+}
+export interface LoginMetaData {
+  id: string;
+  ipAddress: string;
+  userAgent: string;
 }

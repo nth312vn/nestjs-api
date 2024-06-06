@@ -5,12 +5,8 @@ import { NestjsFingerprintModule } from 'nestjs-fingerprint';
   imports: [
     NestjsFingerprintModule.forRoot({
       params: ['headers', 'userAgent', 'ipAddress'],
-      cookieOptions: {
-        name: 'your_cookie_name', // optional
-        httpOnly: true, // optional
-      },
     }),
   ],
-  exports: [FingerprintModule],
+  exports: [FingerPrintModule],
 })
-export class FingerprintModule {}
+export class FingerPrintModule {}

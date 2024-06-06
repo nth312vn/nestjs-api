@@ -16,7 +16,7 @@ export class UserService extends BaseService<Users> {
     return this.create(user);
   }
 
-  isExistUser(userName: string) {
+  getUserInfo(userName: string) {
     return this.getOneByOptions({
       where: {
         userName,

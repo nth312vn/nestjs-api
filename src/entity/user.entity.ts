@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRoles } from './userRole.entity';
-import { Token } from './deviceSession.entity';
+import { DeviceSession } from './deviceSession.entity';
 
 @Entity()
 export class Users {
@@ -26,8 +26,8 @@ export class Users {
 
   @OneToMany(() => UserRoles, (UserRoles) => UserRoles.user)
   userRoles: UserRoles[];
-  @OneToMany(() => Token, (token) => token.user)
-  tokens: Token[];
+  @OneToMany(() => DeviceSession, (deviceSession) => deviceSession.id)
+  tokens: DeviceSession[];
   @CreateDateColumn()
   created_at: Date;
   @UpdateDateColumn()

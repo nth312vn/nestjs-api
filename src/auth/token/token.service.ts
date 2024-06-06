@@ -5,8 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BaseService } from 'src/core/base/baseService';
 import { defaultConfig } from 'src/core/config/defaultConfig';
 import { envKey } from 'src/core/config/envKey';
-import { Token } from 'src/entity/deviceSession.entity';
-import { Users } from 'src/entity/user.entity';
+import { DeviceSession } from 'src/entity/deviceSession.entity';
 import { Repository } from 'typeorm';
 import {
   AccessTokenPayload,
@@ -14,9 +13,10 @@ import {
 } from '../interface/auth.interface';
 
 @Injectable()
-export class TokenService extends BaseService<Token> {
+export class TokenService extends BaseService<DeviceSession> {
   constructor(
-    @InjectRepository(Token) private tokenRepository: Repository<Token>,
+    @InjectRepository(DeviceSession)
+    private tokenRepository: Repository<DeviceSession>,
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {
@@ -25,10 +25,7 @@ export class TokenService extends BaseService<Token> {
   generateAccessToken(payload: AccessTokenPayload) {
     return this.jwtService.signAsync(payload);
   }
-  saveRefreshToken(user: Users, token: string) {
-    const data = this.tokenRepository.create({ user, token });
-    return this.create(data);
-  }
+
   generateRefreshToken(payload: RefreshTokenPayload) {
     return this.jwtService.signAsync(payload, {
       expiresIn:
@@ -36,10 +33,10 @@ export class TokenService extends BaseService<Token> {
         defaultConfig.refreshTokenExpireTime,
     });
   }
-  deleteRefreshToken(id: number) {
+  deleteRefreshToken(id: string) {
     return this.deleteById(id);
   }
-  getRefreshTokenInfo(userId: number, token: string) {
+  getRefreshTokenInfo(userId: string, token: string) {
     return this.getOneByOptions({
       where: {
         token,

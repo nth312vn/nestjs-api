@@ -1,8 +1,17 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Post,
+} from '@nestjs/common';
 import { routeName } from 'src/core/config/routeName';
 import { LoginDto, LogoutDto, RegisterDto } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { successMessage } from 'src/core/message/successMessage';
+import { Fingerprint, IFingerprint } from 'nestjs-fingerprint';
+import { LoginMetaData } from './interface/auth.interface';
 
 @Controller(routeName.auth)
 export class AuthController {
@@ -20,10 +29,21 @@ export class AuthController {
     }
   }
   @Post(routeName.login)
-  async login(@Body() loginDto: LoginDto) {
+  async login(
+    @Body() loginDto: LoginDto,
+    @Fingerprint() fp: IFingerprint,
+    @Headers() headers: Headers,
+  ) {
     try {
-      const { accessToken, refreshToken } =
-        await this.authService.login(loginDto);
+      const metaData: LoginMetaData = {
+        id: fp.id,
+        userAgent: headers['user-agent'],
+        ipAddress: fp.ipAddress.value,
+      };
+      const { accessToken, refreshToken } = await this.authService.login(
+        loginDto,
+        metaData,
+      );
       return {
         accessToken,
         refreshToken,

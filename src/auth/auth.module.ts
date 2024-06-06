@@ -12,13 +12,19 @@ import { envKey } from 'src/core/config/envKey';
 import { defaultConfig } from 'src/core/config/defaultConfig';
 import { TokenService } from './token/token.service';
 import { AuthController } from './auth.controller';
+import { FingerPrintModule } from 'src/auth/deviceSession/fingerPrint/fingerPrint.module';
+import { DeviceSessionService } from './deviceSession/deviceSession.service';
+import { DeviceSession } from 'src/entity/deviceSession.entity';
 
 @Module({
   imports: [
     ConfigModule,
     UserModule,
     RoleModule,
+    FingerPrintModule,
     TypeOrmModule.forFeature([UserRoles]),
+    TypeOrmModule.forFeature([DeviceSession]),
+
     JwtModule.registerAsync({
       global: true,
       useFactory: (configService: ConfigService) => ({
@@ -31,8 +37,9 @@ import { AuthController } from './auth.controller';
       }),
       inject: [ConfigService],
     }),
+    FingerPrintModule,
   ],
-  providers: [PasswordService, AuthService, TokenService],
+  providers: [PasswordService, AuthService, TokenService, DeviceSessionService],
   controllers: [AuthController],
 })
 export class AuthModule {}
