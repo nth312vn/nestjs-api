@@ -15,7 +15,7 @@ export class DeviceSessionService extends BaseService<DeviceSession> {
     super(deviceSessionRepository);
   }
   getSessionInfo(deviceId: string) {
-    this.getOneByOptions({
+    return this.getOneByOptions({
       where: {
         device_id: deviceId,
       },
@@ -29,5 +29,8 @@ export class DeviceSessionService extends BaseService<DeviceSession> {
     deviceInfo.user_agent = userAgent;
     deviceInfo.user = user;
     return this.create(deviceInfo);
+  }
+  deleteDeviceSession(deviceId: string) {
+    return this.deleteById(deviceId);
   }
 }

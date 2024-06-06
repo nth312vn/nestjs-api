@@ -8,23 +8,23 @@ import {
 
 export class BaseService<T> {
   constructor(private genericRepository: Repository<T>) {}
-  getAll() {
+  async getAll() {
     try {
-      return this.genericRepository.find();
+      return await this.genericRepository.find();
     } catch (e) {
       throw new BadGatewayException(e.message);
     }
   }
-  getOneByOptions(options: FindOneOptions<any> = {}) {
+  async getOneByOptions(options: FindOneOptions<any> = {}) {
     try {
-      return this.genericRepository.findOne(options);
+      return await this.genericRepository.findOne(options);
     } catch (e) {
       throw new BadGatewayException(e.message);
     }
   }
-  getManyByOptions(options: FindManyOptions<any> = {}) {
+  async getManyByOptions(options: FindManyOptions<any> = {}) {
     try {
-      return this.genericRepository.find(options);
+      return await this.genericRepository.find(options);
     } catch (e) {
       throw new BadGatewayException(e.message);
     }
@@ -61,7 +61,7 @@ export class BaseService<T> {
   }
   async deleteById(id: string) {
     try {
-      return this.genericRepository.delete(id);
+      return await this.genericRepository.delete(id);
     } catch (e) {
       throw new BadGatewayException(e.message);
     }

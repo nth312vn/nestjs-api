@@ -70,11 +70,16 @@ export class AuthService {
         throw new BadRequestException(exceptionMessage.invalidPassword);
       }
       const { id, email, userName } = user;
+      const session = await this.deviceSessionService.getSessionInfo(
+        metaData.id,
+      );
       const [accessToken, refreshToken] = await Promise.all([
         this.tokenService.generateAccessToken({ id, userName, email }),
         this.tokenService.generateRefreshToken({ id, userName }),
       ]);
-      await this.deviceSessionService.saveDeviceSession(metaData, user);
+      if (!session) {
+        await this.deviceSessionService.saveDeviceSession(metaData, user);
+      }
       return {
         accessToken,
         refreshToken,
@@ -85,19 +90,7 @@ export class AuthService {
   }
   async logout(logoutDto: LogoutDto) {
     try {
-      const { userName, refreshToken } = logoutDto;
-      const user = await this.userService.getUserInfo(userName);
-      if (!user) {
-        throw new NotFoundException(exceptionMessage.userIsNotFound);
-      }
-      const tokenInfo = await this.tokenService.getRefreshTokenInfo(
-        user.id,
-        refreshToken,
-      );
-      if (!tokenInfo) {
-        throw new NotFoundException(exceptionMessage.refreshTokenIsNotFound);
-      }
-      await this.tokenService.deleteRefreshToken(tokenInfo.id);
+      console.log(logoutDto);
     } catch (err) {
       throw err;
     }
