@@ -1,11 +1,11 @@
 export interface AccessTokenPayload {
   id: string;
   email: string;
-  userName: string;
+  username: string;
 }
 export interface RefreshTokenPayload {
   id: string;
-  userName: string;
+  username: string;
 }
 export interface LoginMetaData {
   id: string;

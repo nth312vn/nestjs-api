@@ -7,16 +7,18 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      stopAtFirstError: true,
       exceptionFactory: (errors) => {
         const result = errors.map((error) => ({
           property: error.property,
           message: error.constraints[Object.keys(error.constraints)[0]],
         }));
+
         return new UnprocessableEntityException(result);
       },
+      transform: true,
+      whitelist: true,
+
+      stopAtFirstError: true,
     }),
   );
   await app.listen(3000);

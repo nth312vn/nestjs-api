@@ -16,10 +16,10 @@ export class UserService extends BaseService<Users> {
     return this.create(user);
   }
 
-  getUserInfo(userName: string) {
+  getUserInfo(username: string) {
     return this.getOneByOptions({
       where: {
-        userName,
+        username,
       },
     });
   }

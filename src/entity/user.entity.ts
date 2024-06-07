@@ -14,7 +14,7 @@ export class Users {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @Column({ length: 20, unique: true })
-  userName: string;
+  username: string;
   @Column()
   passwordHashed: string;
   @Column({ length: 50, unique: true })
@@ -23,11 +23,13 @@ export class Users {
   firstName: string;
   @Column({ length: 50 })
   lastName: string;
+  @Column({ type: 'date', nullable: true })
+  date_of_birth: Date;
 
   @OneToMany(() => UserRoles, (UserRoles) => UserRoles.user)
   userRoles: UserRoles[];
   @OneToMany(() => DeviceSession, (deviceSession) => deviceSession.id)
-  tokens: DeviceSession[];
+  deviceSession: DeviceSession[];
   @CreateDateColumn()
   created_at: Date;
   @UpdateDateColumn()

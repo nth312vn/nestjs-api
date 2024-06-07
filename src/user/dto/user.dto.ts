@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, MaxLength } from 'class-validator';
 export class UserDto {
   @IsNotEmpty()
   @MaxLength(20)
-  userName: string;
+  username: string;
   @IsNotEmpty()
   passwordHashed: string;
   @IsNotEmpty()

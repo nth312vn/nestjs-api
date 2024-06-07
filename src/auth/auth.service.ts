@@ -9,9 +9,7 @@ import { exceptionMessage } from 'src/core/message/exceptionMessage';
 import { UserService } from 'src/user/user.service';
 import { PasswordService } from './password/password.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { UserRoles } from 'src/entity/userRole.entity';
-import { RoleService } from 'src/role/role.service';
 import { TokenService } from './token/token.service';
 import { LoginMetaData } from './interface/auth.interface';
 import { DeviceSessionService } from './deviceSession/deviceSession.service';
@@ -22,36 +20,25 @@ export class AuthService {
     private userService: UserService,
     private passwordService: PasswordService,
     @InjectRepository(UserRoles)
-    private userRoleRepository: Repository<UserRoles>,
-    private roleService: RoleService,
     private tokenService: TokenService,
     private deviceSessionService: DeviceSessionService,
   ) {}
   async register(registerDto: RegisterDto) {
     try {
-      const { userName, password, email, firstName, lastName, role } =
-        registerDto;
-      const isExistUser = await this.userService.getUserInfo(userName);
+      const { username, password, email, firstName, lastName } = registerDto;
+      const isExistUser = await this.userService.getUserInfo(username);
       if (isExistUser) {
         throw new ConflictException(exceptionMessage.userAlreadyExist);
       }
-      const roleData = await this.roleService.findRole(role);
-      if (!roleData) {
-        throw new ConflictException(exceptionMessage.roleIsNotValid);
-      }
+
       const passwordHashed = await this.passwordService.hashPassword(password);
-      const userSaved = await this.userService.createUser({
-        userName,
+      await this.userService.createUser({
+        username,
         passwordHashed,
         email,
         firstName,
         lastName,
       });
-      const userRole = this.userRoleRepository.create({
-        user: userSaved,
-        role: roleData,
-      });
-      await this.userRoleRepository.save(userRole);
     } catch (err) {
       throw err;
     }
@@ -69,13 +56,13 @@ export class AuthService {
       if (!isMatchPassword) {
         throw new BadRequestException(exceptionMessage.invalidPassword);
       }
-      const { id, email, userName } = user;
+      const { id, email, username } = user;
       const session = await this.deviceSessionService.getSessionInfo(
         metaData.id,
       );
       const [accessToken, refreshToken] = await Promise.all([
-        this.tokenService.generateAccessToken({ id, userName, email }),
-        this.tokenService.generateRefreshToken({ id, userName }),
+        this.tokenService.generateAccessToken({ id, username, email }),
+        this.tokenService.generateRefreshToken({ id, username }),
       ]);
       if (!session) {
         await this.deviceSessionService.saveDeviceSession(metaData, user);

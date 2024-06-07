@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, MaxLength } from 'class-validator';
 export class RegisterDto {
   @IsNotEmpty()
   @MaxLength(20)
-  userName: string;
+  username: string;
   @IsNotEmpty()
   @MaxLength(20)
   password: string;
@@ -17,9 +17,6 @@ export class RegisterDto {
   @IsNotEmpty()
   @MaxLength(50)
   lastName: string;
-  @IsNotEmpty()
-  @MaxLength(50)
-  role: string;
 }
 export class LoginDto {
   @IsNotEmpty()
