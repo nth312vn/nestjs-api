@@ -8,8 +8,6 @@ import { LoginDto, LogoutDto, RegisterDto } from './dto/auth.dto';
 import { exceptionMessage } from 'src/core/message/exceptionMessage';
 import { UserService } from 'src/user/user.service';
 import { PasswordService } from './password/password.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserRoles } from 'src/entity/userRole.entity';
 import { TokenService } from './token/token.service';
 import { LoginMetaData } from './interface/auth.interface';
 import { DeviceSessionService } from './deviceSession/deviceSession.service';
@@ -19,9 +17,8 @@ export class AuthService {
   constructor(
     private userService: UserService,
     private passwordService: PasswordService,
-    @InjectRepository(UserRoles)
-    private tokenService: TokenService,
     private deviceSessionService: DeviceSessionService,
+    private tokenService: TokenService,
   ) {}
   async register(registerDto: RegisterDto) {
     try {
@@ -45,7 +42,7 @@ export class AuthService {
   }
   async login(loginDto: LoginDto, metaData: LoginMetaData) {
     try {
-      const user = await this.userService.getUserInfo(loginDto.userName);
+      const user = await this.userService.getUserInfo(loginDto.username);
       if (!user) {
         throw new NotFoundException(exceptionMessage.userIsNotFound);
       }

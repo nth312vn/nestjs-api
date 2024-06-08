@@ -21,7 +21,7 @@ export class RegisterDto {
 export class LoginDto {
   @IsNotEmpty()
   @MaxLength(20)
-  userName: string;
+  username: string;
   @IsNotEmpty()
   @MaxLength(20)
   password: string;
