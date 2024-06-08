@@ -19,14 +19,10 @@ export class AuthController {
   @Post(routeName.register)
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() registerDto: RegisterDto) {
-    try {
-      await this.authService.register(registerDto);
-      return {
-        message: successMessage.userHadBeenCreated,
-      };
-    } catch (err) {
-      throw err;
-    }
+    await this.authService.register(registerDto);
+    return {
+      message: successMessage.userHadBeenCreated,
+    };
   }
   @Post(routeName.login)
   async login(
@@ -34,33 +30,25 @@ export class AuthController {
     @Fingerprint() fp: IFingerprint,
     @Headers() headers: Headers,
   ) {
-    try {
-      const metaData: LoginMetaData = {
-        id: fp.id,
-        userAgent: headers['user-agent'],
-        ipAddress: fp.ipAddress.value,
-      };
-      const { accessToken, refreshToken } = await this.authService.login(
-        loginDto,
-        metaData,
-      );
-      return {
-        accessToken,
-        refreshToken,
-      };
-    } catch (err) {
-      throw err;
-    }
+    const metaData: LoginMetaData = {
+      id: fp.id,
+      userAgent: headers['user-agent'],
+      ipAddress: fp.ipAddress.value,
+    };
+    const { accessToken, refreshToken } = await this.authService.login(
+      loginDto,
+      metaData,
+    );
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
   @Post(routeName.logout)
   async logout(@Body() logoutDto: LogoutDto) {
-    try {
-      await this.logout(logoutDto);
-      return {
-        message: successMessage.logoutSuccess,
-      };
-    } catch (err) {
-      throw err;
-    }
+    await this.authService.logout(logoutDto);
+    return {
+      message: successMessage.logoutSuccess,
+    };
   }
 }

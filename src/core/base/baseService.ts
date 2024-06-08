@@ -1,4 +1,4 @@
-import { BadGatewayException } from '@nestjs/common';
+import { BadGatewayException, NotFoundException } from '@nestjs/common';
 import {
   FindManyOptions,
   FindOneOptions,
@@ -7,26 +7,29 @@ import {
 } from 'typeorm';
 
 export class BaseService<T> {
+  private handleException(message: string) {
+    throw new BadGatewayException(message);
+  }
   constructor(private genericRepository: Repository<T>) {}
-  async getAll() {
+  async getAll(): Promise<T[]> {
     try {
       return await this.genericRepository.find();
     } catch (e) {
-      throw new BadGatewayException(e.message);
+      this.handleException(e.message);
     }
   }
   async getOneByOptions(options: FindOneOptions<any> = {}) {
     try {
       return await this.genericRepository.findOne(options);
     } catch (e) {
-      throw new BadGatewayException(e.message);
+      this.handleException(e.message);
     }
   }
   async getManyByOptions(options: FindManyOptions<any> = {}) {
     try {
       return await this.genericRepository.find(options);
     } catch (e) {
-      throw new BadGatewayException(e.message);
+      this.handleException(e.message);
     }
   }
   async create(entities: any, options: SaveOptions = {}) {
@@ -34,7 +37,7 @@ export class BaseService<T> {
       const data = await this.genericRepository.save(entities, options);
       return data;
     } catch (e) {
-      throw new BadGatewayException(e.message);
+      this.handleException(e.message);
     }
   }
   async update(entities: any, options: SaveOptions) {
@@ -45,7 +48,7 @@ export class BaseService<T> {
         },
       });
       if (!record) {
-        throw new Error('Id is invalid');
+        throw new NotFoundException('Id is invalid');
       }
       const result = await this.genericRepository.save(
         {
@@ -56,14 +59,18 @@ export class BaseService<T> {
       );
       return result;
     } catch (e) {
-      throw new BadGatewayException(e.message);
+      this.handleException(e.message);
     }
   }
   async deleteById(id: string) {
     try {
-      return await this.genericRepository.delete(id);
+      const result = await this.genericRepository.delete(id);
+      if (result.affected === 0) {
+        throw new NotFoundException(`Entity with id ${id} not found`);
+      }
+      return result;
     } catch (e) {
-      throw new BadGatewayException(e.message);
+      this.handleException(e.message);
     }
   }
 }

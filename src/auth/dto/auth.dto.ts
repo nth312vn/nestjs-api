@@ -28,8 +28,7 @@ export class LoginDto {
 }
 export class LogoutDto {
   @IsNotEmpty()
-  refreshToken: string;
+  deviceId: string;
   @IsNotEmpty()
-  @MaxLength(20)
-  userName: string;
+  userId: string;
 }

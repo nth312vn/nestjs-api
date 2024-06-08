@@ -13,7 +13,6 @@ import { Roles } from './role.entity';
 export class UserRoles {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
   @ManyToOne(() => Users, (user) => user.userRoles)
   @JoinColumn({ name: 'userId' })
   user: Users;
