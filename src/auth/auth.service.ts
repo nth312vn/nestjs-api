@@ -9,7 +9,7 @@ import { LoginDto, LogoutDto, RegisterDto } from './dto/auth.dto';
 import { exceptionMessage } from 'src/core/message/exceptionMessage';
 import { UserService } from 'src/user/user.service';
 import { PasswordService } from './password/password.service';
-import { TokenService } from './token/token.service';
+import { TokenService } from '../core/token/token.service';
 import { LoginMetaData } from './interface/auth.interface';
 import { DeviceSessionService } from './deviceSession/deviceSession.service';
 
@@ -53,13 +53,24 @@ export class AuthService {
     }
     const { id, email, username } = user;
     const session = await this.deviceSessionService.getSessionInfo(metaData.id);
-    const [accessToken, refreshToken] = await Promise.all([
-      this.tokenService.generateAccessToken({ id, username, email }),
-      this.tokenService.generateRefreshToken({ id, username }),
-    ]);
+
     if (!session) {
       await this.deviceSessionService.saveDeviceSession(metaData, user);
     }
+    const [accessToken, refreshToken] = await Promise.all([
+      this.tokenService.generateAccessToken({
+        id,
+        username,
+        email,
+        deviceId: metaData.id,
+      }),
+      this.tokenService.generateRefreshToken({
+        id,
+        username,
+        email,
+        deviceId: metaData.id,
+      }),
+    ]);
     this.logger.log(`User logged in: ${username}`);
     return {
       accessToken,

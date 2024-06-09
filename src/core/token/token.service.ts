@@ -6,8 +6,7 @@ import { envKey } from 'src/core/config/envKey';
 import {
   AccessTokenPayload,
   RefreshTokenPayload,
-} from '../interface/auth.interface';
-
+} from '../../auth/interface/auth.interface';
 @Injectable()
 export class TokenService {
   constructor(
@@ -20,9 +19,21 @@ export class TokenService {
 
   generateRefreshToken(payload: RefreshTokenPayload) {
     return this.jwtService.signAsync(payload, {
-      expiresIn:
-        this.configService.get<string>(envKey.REFRESH_TOKEN_EXPIRE_TIME) ||
+      secret: this.configService.get<string>(envKey.REFRESH_TOKEN_SECRET_KEY),
+      expiresIn: this.configService.get<string>(
+        envKey.REFRESH_TOKEN_EXPIRE_TIME,
         defaultConfig.refreshTokenExpireTime,
+      ),
+    });
+  }
+  async verifyAccessToken(token: string): Promise<AccessTokenPayload> {
+    return await this.jwtService.verifyAsync(token, {
+      secret: this.configService.get<string>(envKey.ACCESS_TOKEN_SECRET_KEY),
+    });
+  }
+  async verifyRefreshToken(token: string): Promise<RefreshTokenPayload> {
+    return await this.jwtService.verifyAsync(token, {
+      secret: this.configService.get<string>(envKey.REFRESH_TOKEN_SECRET_KEY),
     });
   }
 }

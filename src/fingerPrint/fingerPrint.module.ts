@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { NestjsFingerprintModule } from 'nestjs-fingerprint';
-
+@Global()
 @Module({
   imports: [
     NestjsFingerprintModule.forRoot({
