@@ -9,7 +9,7 @@ import { LoginDto, LogoutDto, RegisterDto } from './dto/auth.dto';
 import { exceptionMessage } from 'src/core/message/exceptionMessage';
 import { UserService } from 'src/user/user.service';
 import { PasswordService } from './password/password.service';
-import { TokenService } from '../core/token/token.service';
+import { TokenService } from '../token/token.service';
 import { LoginMetaData } from './interface/auth.interface';
 import { DeviceSessionService } from './deviceSession/deviceSession.service';
 

@@ -6,7 +6,7 @@ import { envKey } from 'src/core/config/envKey';
 import {
   AccessTokenPayload,
   RefreshTokenPayload,
-} from '../../auth/interface/auth.interface';
+} from '../auth/interface/auth.interface';
 @Injectable()
 export class TokenService {
   constructor(
