@@ -84,23 +84,30 @@ export class AuthService {
         await this.deviceSessionService.getDeviceSessionWithUserInfo(
           payload.deviceId,
         );
-      if (
-        !session ||
-        session.user.id !== payload.id ||
-        compareTimeStampLater(payload.exp, new Date().getTime())
-      ) {
+      if (!session || session.user.id !== payload.id) {
         throw new Error();
       }
-      const [accessToken, newRefreshToken] = await this.tokenService.generate({
+      const tokenPayload = {
         id: payload.id,
         username: payload.username,
         email: payload.email,
         deviceId: payload.deviceId,
-      });
-      return {
-        accessToken,
-        refreshToken: newRefreshToken,
       };
+      if (compareTimeStampLater(payload.exp, new Date().getTime())) {
+        const [accessToken, newRefreshToken] =
+          await this.tokenService.generate(tokenPayload);
+        return {
+          accessToken,
+          refreshToken: newRefreshToken,
+        };
+      } else {
+        const accessToken =
+          await this.tokenService.generateAccessToken(tokenPayload);
+        return {
+          accessToken,
+          refreshToken,
+        };
+      }
     } catch {
       throw new UnauthorizedException('Refresh token invalid');
     }
