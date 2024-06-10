@@ -31,13 +31,16 @@ export class DeviceSessionService extends BaseService<DeviceSession> {
     deviceInfo.user = user;
     return this.create(deviceInfo);
   }
-  async deleteDeviceSession(logoutDto: LogoutDto) {
-    const { userId, deviceId } = logoutDto;
-    const session = await this.deviceSessionRepository
+  async getDeviceSessionWithUserInfo(deviceId: string) {
+    return await this.deviceSessionRepository
       .createQueryBuilder('device_session')
       .leftJoinAndSelect('device_session.user', 'users')
       .where('device_session.device_id = :deviceId', { deviceId })
       .getOne();
+  }
+  async deleteDeviceSession(logoutDto: LogoutDto) {
+    const { userId, deviceId } = logoutDto;
+    const session = await this.getDeviceSessionWithUserInfo(deviceId);
     if (!session || session.user.id !== userId) {
       throw new ForbiddenException();
     }

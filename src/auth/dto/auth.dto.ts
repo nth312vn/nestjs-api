@@ -32,3 +32,7 @@ export class LogoutDto {
   @IsNotEmpty()
   userId: string;
 }
+export class ReAuthDto {
+  @IsNotEmpty()
+  refreshToken: string;
+}

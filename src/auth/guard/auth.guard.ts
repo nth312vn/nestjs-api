@@ -9,10 +9,7 @@ import { TokenService } from 'src/token/token.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(
-    private tokenService: TokenService,
-    // @Fingerprint() private fp: IFingerprint,
-  ) {}
+  constructor(private tokenService: TokenService) {}
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;

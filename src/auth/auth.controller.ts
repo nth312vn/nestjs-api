@@ -7,7 +7,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { routeName } from 'src/core/config/routeName';
-import { LoginDto, LogoutDto, RegisterDto } from './dto/auth.dto';
+import { LoginDto, LogoutDto, ReAuthDto, RegisterDto } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { successMessage } from 'src/core/message/successMessage';
 import { Fingerprint, IFingerprint } from 'nestjs-fingerprint';
@@ -49,6 +49,16 @@ export class AuthController {
     await this.authService.logout(logoutDto);
     return {
       message: successMessage.logoutSuccess,
+    };
+  }
+  @Post('reAuth')
+  async reAuth(@Body() reAuthDto: ReAuthDto) {
+    const { accessToken, refreshToken } = await this.authService.reAuth(
+      reAuthDto.refreshToken,
+    );
+    return {
+      accessToken,
+      refreshToken,
     };
   }
 }

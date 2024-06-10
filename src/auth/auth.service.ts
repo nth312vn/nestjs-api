@@ -4,6 +4,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { LoginDto, LogoutDto, RegisterDto } from './dto/auth.dto';
 import { exceptionMessage } from 'src/core/message/exceptionMessage';
@@ -12,6 +13,7 @@ import { PasswordService } from './password/password.service';
 import { TokenService } from '../token/token.service';
 import { LoginMetaData } from './interface/auth.interface';
 import { DeviceSessionService } from './deviceSession/deviceSession.service';
+import { compareTimeStampLater } from 'src/utils/dateTime';
 
 @Injectable()
 export class AuthService {
@@ -57,20 +59,12 @@ export class AuthService {
     if (!session) {
       await this.deviceSessionService.saveDeviceSession(metaData, user);
     }
-    const [accessToken, refreshToken] = await Promise.all([
-      this.tokenService.generateAccessToken({
-        id,
-        username,
-        email,
-        deviceId: metaData.id,
-      }),
-      this.tokenService.generateRefreshToken({
-        id,
-        username,
-        email,
-        deviceId: metaData.id,
-      }),
-    ]);
+    const [accessToken, refreshToken] = await this.tokenService.generate({
+      id,
+      username,
+      email,
+      deviceId: metaData.id,
+    });
     this.logger.log(`User logged in: ${username}`);
     return {
       accessToken,
@@ -82,5 +76,33 @@ export class AuthService {
     this.logger.log(
       `User logged out: ${logoutDto.userId} ${logoutDto.deviceId}`,
     );
+  }
+  async reAuth(refreshToken: string) {
+    try {
+      const payload = await this.tokenService.verifyRefreshToken(refreshToken);
+      const session =
+        await this.deviceSessionService.getDeviceSessionWithUserInfo(
+          payload.deviceId,
+        );
+      if (
+        !session ||
+        session.user.id !== payload.id ||
+        compareTimeStampLater(payload.exp, new Date().getTime())
+      ) {
+        throw new Error();
+      }
+      const [accessToken, newRefreshToken] = await this.tokenService.generate({
+        id: payload.id,
+        username: payload.username,
+        email: payload.email,
+        deviceId: payload.deviceId,
+      });
+      return {
+        accessToken,
+        refreshToken: newRefreshToken,
+      };
+    } catch {
+      throw new UnauthorizedException('Refresh token invalid');
+    }
   }
 }
