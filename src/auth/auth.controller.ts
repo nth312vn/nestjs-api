@@ -7,7 +7,14 @@ import {
   Post,
 } from '@nestjs/common';
 import { routeName } from 'src/core/config/routeName';
-import { LoginDto, LogoutDto, ReAuthDto, RegisterDto } from './dto/auth.dto';
+import {
+  ForgotPasswordDto,
+  LoginDto,
+  LogoutDto,
+  ReAuthDto,
+  RegisterDto,
+  ResetPasswordDto,
+} from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { successMessage } from 'src/core/message/successMessage';
 import { Fingerprint, IFingerprint } from 'nestjs-fingerprint';
@@ -51,7 +58,7 @@ export class AuthController {
       message: successMessage.logoutSuccess,
     };
   }
-  @Post('reAuth')
+  @Post(routeName.reAuth)
   async reAuth(@Body() reAuthDto: ReAuthDto) {
     const { accessToken, refreshToken } = await this.authService.reAuth(
       reAuthDto.refreshToken,
@@ -60,5 +67,15 @@ export class AuthController {
       accessToken,
       refreshToken,
     };
+  }
+  @Post('forgot-password')
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    const { email } = forgotPasswordDto;
+    await this.authService.forgotPassword(email);
+    return { message: 'Password reset link sent' };
+  }
+  @Post('reset-password')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    await this.authService.resetPassword(resetPasswordDto);
   }
 }

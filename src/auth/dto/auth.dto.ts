@@ -36,3 +36,14 @@ export class ReAuthDto {
   @IsNotEmpty()
   refreshToken: string;
 }
+export class ForgotPasswordDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+}
+export class ResetPasswordDto {
+  @IsNotEmpty()
+  token: string;
+  @IsNotEmpty()
+  newPassword: string;
+}

@@ -3,4 +3,5 @@ export const routeName = {
   register: 'register',
   login: 'login',
   logout: 'logout',
+  reAuth: 're-auth',
 };

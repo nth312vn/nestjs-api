@@ -6,7 +6,12 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { LoginDto, LogoutDto, RegisterDto } from './dto/auth.dto';
+import {
+  LoginDto,
+  LogoutDto,
+  RegisterDto,
+  ResetPasswordDto,
+} from './dto/auth.dto';
 import { exceptionMessage } from 'src/core/message/exceptionMessage';
 import { UserService } from 'src/user/user.service';
 import { PasswordService } from './password/password.service';
@@ -14,6 +19,9 @@ import { TokenService } from '../token/token.service';
 import { LoginMetaData } from './interface/auth.interface';
 import { DeviceSessionService } from './deviceSession/deviceSession.service';
 import { compareTimeStampLater } from 'src/utils/dateTime';
+import { ConfigService } from '@nestjs/config';
+import { envKey } from 'src/core/config/envKey';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -22,11 +30,13 @@ export class AuthService {
     private passwordService: PasswordService,
     private deviceSessionService: DeviceSessionService,
     private tokenService: TokenService,
+    private configService: ConfigService,
+    private mailerService: MailerService,
   ) {}
   private logger = new Logger(AuthService.name);
   async register(registerDto: RegisterDto) {
     const { username, password, email, firstName, lastName } = registerDto;
-    const isExistUser = await this.userService.getUserInfo(username);
+    const isExistUser = await this.userService.getUserInfo({ username });
     if (isExistUser) {
       throw new ConflictException(exceptionMessage.userAlreadyExist);
     }
@@ -42,7 +52,9 @@ export class AuthService {
     this.logger.log(`User registered: ${username}`);
   }
   async login(loginDto: LoginDto, metaData: LoginMetaData) {
-    const user = await this.userService.getUserInfo(loginDto.username);
+    const user = await this.userService.getUserInfo({
+      username: loginDto.username,
+    });
     if (!user) {
       throw new NotFoundException(exceptionMessage.userIsNotFound);
     }
@@ -111,5 +123,36 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException('Refresh token invalid');
     }
+  }
+  async forgotPassword(email: string) {
+    const user = await this.userService.getUserInfo({ email });
+    if (!user) {
+      throw new NotFoundException('email is invalid');
+    }
+    const token = this.tokenService.generateForgotPasswordToken({
+      email,
+    });
+    const url = `${this.configService.get<string>(envKey.FRONTEND_URL)}/reset-password?token=${token}`;
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Password Reset',
+      template: './reset-password',
+      context: {
+        url,
+      },
+    });
+  }
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const { token, newPassword } = resetPasswordDto;
+    const payload = await this.tokenService.verifyForgotPasswordToken(token);
+    const user = await this.userService.getUserInfo({ email: payload.email });
+    if (!user) {
+      throw new NotFoundException(
+        'email resetPasswordDto:ResetPasswordDtois invalid',
+      );
+    }
+    const passwordHashed = await this.passwordService.hashPassword(newPassword);
+    await this.userService.updatePassword(user.id, passwordHashed);
+    return { message: 'Password has been reset' };
   }
 }

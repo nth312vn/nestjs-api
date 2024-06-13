@@ -16,11 +16,17 @@ export class UserService extends BaseService<Users> {
     return this.create(user);
   }
 
-  getUserInfo(username: string) {
+  getUserInfo(params: Partial<Users>) {
     return this.getOneByOptions({
       where: {
-        username,
+        ...params,
       },
+    });
+  }
+  updatePassword(userId: string, password: string) {
+    return this.update({
+      username: userId,
+      passwordHashed: password,
     });
   }
 }

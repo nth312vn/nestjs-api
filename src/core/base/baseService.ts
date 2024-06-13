@@ -6,7 +6,7 @@ import {
   SaveOptions,
 } from 'typeorm';
 
-export class BaseService<T> {
+export class BaseService<T extends { id: string }> {
   private handleException(message: string) {
     throw new BadGatewayException(message);
   }
@@ -40,7 +40,7 @@ export class BaseService<T> {
       this.handleException(e.message);
     }
   }
-  async update(entities: any, options: SaveOptions) {
+  async update(entities: Partial<T>, options: SaveOptions = {}) {
     try {
       const record = await this.getOneByOptions({
         where: {

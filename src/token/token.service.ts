@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { TokenDecoded, TokenPayload } from 'src/auth/interface/auth.interface';
+import {
+  ForgotPasswordDecode,
+  ForgotPasswordTokenPayload,
+  TokenDecoded,
+  TokenPayload,
+} from 'src/auth/interface/auth.interface';
 import { defaultConfig } from 'src/core/config/defaultConfig';
 import { envKey } from 'src/core/config/envKey';
 
@@ -24,6 +29,15 @@ export class TokenService {
       ),
     });
   }
+  generateForgotPasswordToken(payload: ForgotPasswordTokenPayload) {
+    return this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>(envKey.FORGOT_PASSWORD_SECRET_KEY),
+      expiresIn: this.configService.get<string>(
+        envKey.FORGOT_PASSWORD_TOKEN_EXPIRE_TIME,
+        defaultConfig.forgotPasswordTokenExpireTime,
+      ),
+    });
+  }
   async generate(payload: TokenPayload) {
     const [accessToken, refreshToken] = await Promise.all([
       this.generateAccessToken(payload),
@@ -39,6 +53,13 @@ export class TokenService {
   async verifyRefreshToken(token: string): Promise<TokenDecoded> {
     return await this.jwtService.verifyAsync(token, {
       secret: this.configService.get<string>(envKey.REFRESH_TOKEN_SECRET_KEY),
+    });
+  }
+  async verifyForgotPasswordToken(
+    token: string,
+  ): Promise<ForgotPasswordDecode> {
+    return await this.jwtService.verifyAsync(token, {
+      secret: this.configService.get<string>(envKey.FORGOT_PASSWORD_SECRET_KEY),
     });
   }
 }
