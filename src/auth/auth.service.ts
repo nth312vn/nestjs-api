@@ -23,7 +23,6 @@ import { ConfigService } from '@nestjs/config';
 import { envKey } from 'src/core/config/envKey';
 import { MailerService } from '@nestjs-modules/mailer';
 import { DataSource } from 'typeorm';
-import { DeviceSession } from 'src/entity/deviceSession.entity';
 
 @Injectable()
 export class AuthService {
@@ -164,12 +163,10 @@ export class AuthService {
         passwordHashed,
       );
       await queryRunner.manager.save(result);
-      await queryRunner.manager
-        .createQueryBuilder()
-        .delete()
-        .from(DeviceSession)
-        .where('user_id = :userId', { userId: user.id })
-        .execute();
+      await this.deviceSessionService.deleteAllDeviceSessionWithManager(
+        queryRunner.manager,
+        user.id,
+      );
       await queryRunner.commitTransaction();
       return { message: 'Password has been reset successfully' };
     } catch (err) {

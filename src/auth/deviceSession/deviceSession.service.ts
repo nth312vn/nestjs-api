@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseService } from 'src/core/base/baseService';
 import { DeviceSession } from 'src/entity/deviceSession.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { LoginMetaData } from '../interface/auth.interface';
 import { Users } from 'src/entity/user.entity';
 import { LogoutDto } from '../dto/auth.dto';
@@ -45,5 +45,13 @@ export class DeviceSessionService extends BaseService<DeviceSession> {
       throw new ForbiddenException();
     }
     return this.deleteById(session.id);
+  }
+  deleteAllDeviceSessionWithManager(manager: EntityManager, userId: string) {
+    return manager
+      .createQueryBuilder()
+      .delete()
+      .from(DeviceSession)
+      .where('user_id = :userId', { userId })
+      .execute();
   }
 }
