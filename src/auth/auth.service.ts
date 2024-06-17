@@ -22,6 +22,8 @@ import { compareTimeStampLater } from 'src/utils/dateTime';
 import { ConfigService } from '@nestjs/config';
 import { envKey } from 'src/core/config/envKey';
 import { MailerService } from '@nestjs-modules/mailer';
+import { DataSource } from 'typeorm';
+import { DeviceSession } from 'src/entity/deviceSession.entity';
 
 @Injectable()
 export class AuthService {
@@ -32,6 +34,7 @@ export class AuthService {
     private tokenService: TokenService,
     private configService: ConfigService,
     private mailerService: MailerService,
+    private dataSource: DataSource,
   ) {}
   private logger = new Logger(AuthService.name);
   async register(registerDto: RegisterDto) {
@@ -143,16 +146,37 @@ export class AuthService {
     });
   }
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    const { token, newPassword } = resetPasswordDto;
-    const payload = await this.tokenService.verifyForgotPasswordToken(token);
-    const user = await this.userService.getUserInfo({ email: payload.email });
-    if (!user) {
-      throw new NotFoundException(
-        'email resetPasswordDto:ResetPasswordDtois invalid',
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+
+    await queryRunner.startTransaction();
+    try {
+      const { token, newPassword } = resetPasswordDto;
+      const payload = await this.tokenService.verifyForgotPasswordToken(token);
+      const user = await this.userService.getUserInfo({ email: payload.email });
+      if (!user) {
+        throw new NotFoundException('email is invalid');
+      }
+      const passwordHashed =
+        await this.passwordService.hashPassword(newPassword);
+      const result = await this.userService.updatePassword(
+        user.id,
+        passwordHashed,
       );
+      await queryRunner.manager.save(result);
+      await queryRunner.manager
+        .createQueryBuilder()
+        .delete()
+        .from(DeviceSession)
+        .where('user_id = :userId', { userId: user.id })
+        .execute();
+      await queryRunner.commitTransaction();
+      return { message: 'Password has been reset successfully' };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
     }
-    const passwordHashed = await this.passwordService.hashPassword(newPassword);
-    await this.userService.updatePassword(user.id, passwordHashed);
-    return { message: 'Password has been reset' };
   }
 }
