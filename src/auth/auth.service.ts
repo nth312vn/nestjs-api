@@ -127,6 +127,10 @@ export class AuthService {
       email,
     });
     console.log(token);
+    await this.userService.updateUser({
+      id: user.id,
+      forgot_password_token: token,
+    });
     const url = `${this.configService.get<string>(envKey.FRONTEND_URL)}/reset-password?token=${token}`;
     await this.sendMailService.sendPasswordReset(email, url);
   }
@@ -141,6 +145,9 @@ export class AuthService {
       const user = await this.userService.getUserInfo({ email: payload.email });
       if (!user) {
         throw new NotFoundException('email is invalid');
+      }
+      if (!user.forgot_password_token || user.forgot_password_token !== token) {
+        throw new NotFoundException('token is invalid');
       }
       const passwordHashed =
         await this.passwordService.hashPassword(newPassword);

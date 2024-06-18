@@ -25,6 +25,8 @@ export class Users {
   lastName: string;
   @Column({ type: 'date', nullable: true })
   date_of_birth: Date;
+  @Column({ nullable: true })
+  forgot_password_token: string;
 
   @OneToMany(() => UserRoles, (UserRoles) => UserRoles.user)
   userRoles: UserRoles[];
