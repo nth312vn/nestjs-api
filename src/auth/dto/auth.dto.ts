@@ -47,3 +47,9 @@ export class ResetPasswordDto {
   @IsNotEmpty()
   newPassword: string;
 }
+export class ChangePasswordDto {
+  @IsNotEmpty()
+  oldPassword: string;
+  @IsNotEmpty()
+  newPassword: string;
+}

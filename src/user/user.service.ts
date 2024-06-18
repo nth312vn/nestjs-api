@@ -23,10 +23,7 @@ export class UserService extends BaseService<Users> {
       },
     });
   }
-  updatePassword(userId: string, password: string) {
-    return this.update({
-      username: userId,
-      passwordHashed: password,
-    });
+  updateUser(entity: Partial<Users>) {
+    return this.update(entity);
   }
 }

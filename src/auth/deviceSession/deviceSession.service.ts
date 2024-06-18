@@ -51,7 +51,7 @@ export class DeviceSessionService extends BaseService<DeviceSession> {
       .createQueryBuilder()
       .delete()
       .from(DeviceSession)
-      .where('user_id = :userId', { userId })
+      .where('userId = :userId', { userId })
       .execute();
   }
 }

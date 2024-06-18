@@ -10,6 +10,7 @@ import { AuthController } from './auth.controller';
 import { FingerPrintModule } from 'src/fingerPrint/fingerPrint.module';
 import { DeviceSessionService } from './deviceSession/deviceSession.service';
 import { DeviceSession } from 'src/entity/deviceSession.entity';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { DeviceSession } from 'src/entity/deviceSession.entity';
     TypeOrmModule.forFeature([UserRoles]),
     TypeOrmModule.forFeature([DeviceSession]),
     FingerPrintModule,
+    MailModule,
   ],
   providers: [PasswordService, AuthService, DeviceSessionService],
   controllers: [AuthController],

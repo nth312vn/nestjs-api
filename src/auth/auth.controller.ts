@@ -5,9 +5,11 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { routeName } from 'src/core/config/routeName';
 import {
+  ChangePasswordDto,
   ForgotPasswordDto,
   LoginDto,
   LogoutDto,
@@ -19,6 +21,9 @@ import { AuthService } from './auth.service';
 import { successMessage } from 'src/core/message/successMessage';
 import { Fingerprint, IFingerprint } from 'nestjs-fingerprint';
 import { LoginMetaData } from './interface/auth.interface';
+import { AuthGuard } from './guard/auth.guard';
+import { User } from 'src/decorator/user.decorator';
+import { UserDecorator } from 'src/user/interface/user.interface';
 
 @Controller(routeName.auth)
 export class AuthController {
@@ -77,5 +82,14 @@ export class AuthController {
   @Post('reset-password')
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     await this.authService.resetPassword(resetPasswordDto);
+    return { message: 'Password has been reset successfully' };
+  }
+  @UseGuards(AuthGuard)
+  @Post('change-password')
+  async changePassword(
+    @Body() changePasswordDto: ChangePasswordDto,
+    @User() user: UserDecorator,
+  ) {
+    await this.authService.changePassword(changePasswordDto, user);
   }
 }

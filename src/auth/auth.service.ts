@@ -7,6 +7,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import {
+  ChangePasswordDto,
   LoginDto,
   LogoutDto,
   RegisterDto,
@@ -18,11 +19,11 @@ import { PasswordService } from './password/password.service';
 import { TokenService } from '../token/token.service';
 import { LoginMetaData } from './interface/auth.interface';
 import { DeviceSessionService } from './deviceSession/deviceSession.service';
-import { compareTimeStampLater } from 'src/utils/dateTime';
 import { ConfigService } from '@nestjs/config';
 import { envKey } from 'src/core/config/envKey';
-import { MailerService } from '@nestjs-modules/mailer';
 import { DataSource } from 'typeorm';
+import { UserDecorator } from 'src/user/interface/user.interface';
+import { SendMailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -32,7 +33,7 @@ export class AuthService {
     private deviceSessionService: DeviceSessionService,
     private tokenService: TokenService,
     private configService: ConfigService,
-    private mailerService: MailerService,
+    private sendMailService: SendMailService,
     private dataSource: DataSource,
   ) {}
   private logger = new Logger(AuthService.name);
@@ -107,21 +108,12 @@ export class AuthService {
         email: payload.email,
         deviceId: payload.deviceId,
       };
-      if (compareTimeStampLater(payload.exp, new Date().getTime())) {
-        const [accessToken, newRefreshToken] =
-          await this.tokenService.generate(tokenPayload);
-        return {
-          accessToken,
-          refreshToken: newRefreshToken,
-        };
-      } else {
-        const accessToken =
-          await this.tokenService.generateAccessToken(tokenPayload);
-        return {
-          accessToken,
-          refreshToken,
-        };
-      }
+      const [accessToken, newRefreshToken] =
+        await this.tokenService.generate(tokenPayload);
+      return {
+        accessToken,
+        refreshToken: newRefreshToken,
+      };
     } catch {
       throw new UnauthorizedException('Refresh token invalid');
     }
@@ -131,18 +123,12 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('email is invalid');
     }
-    const token = this.tokenService.generateForgotPasswordToken({
+    const token = await this.tokenService.generateForgotPasswordToken({
       email,
     });
+    console.log(token);
     const url = `${this.configService.get<string>(envKey.FRONTEND_URL)}/reset-password?token=${token}`;
-    await this.mailerService.sendMail({
-      to: email,
-      subject: 'Password Reset',
-      template: './reset-password',
-      context: {
-        url,
-      },
-    });
+    await this.sendMailService.sendPasswordReset(email, url);
   }
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -158,17 +144,51 @@ export class AuthService {
       }
       const passwordHashed =
         await this.passwordService.hashPassword(newPassword);
-      const result = await this.userService.updatePassword(
+      user.passwordHashed = passwordHashed;
+      await queryRunner.manager.save(user);
+      await this.deviceSessionService.deleteAllDeviceSessionWithManager(
+        queryRunner.manager,
         user.id,
-        passwordHashed,
       );
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+  async changePassword(
+    changePasswordDto: ChangePasswordDto,
+    userDecorator: UserDecorator,
+  ) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+
+    await queryRunner.startTransaction();
+    try {
+      const user = await this.userService.getUserInfo({ id: userDecorator.id });
+      const isMatchPassword = await this.passwordService.isMatchPassword(
+        changePasswordDto.oldPassword,
+        user.passwordHashed,
+      );
+      if (!isMatchPassword) {
+        throw new UnauthorizedException('Password is invalid');
+      }
+      const passwordHashed = await this.passwordService.hashPassword(
+        changePasswordDto.newPassword,
+      );
+      const result = await this.userService.updateUser({
+        id: user.id,
+        passwordHashed,
+      });
       await queryRunner.manager.save(result);
       await this.deviceSessionService.deleteAllDeviceSessionWithManager(
         queryRunner.manager,
         user.id,
       );
       await queryRunner.commitTransaction();
-      return { message: 'Password has been reset successfully' };
+      return { message: 'Password has been update successfully' };
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
