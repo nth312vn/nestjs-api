@@ -8,10 +8,10 @@ export interface TokenDecoded extends TokenPayload {
   iat: number;
   exp: number;
 }
-export interface ForgotPasswordTokenPayload {
+export interface CommonTokenPayload {
   email: string;
 }
-export interface ForgotPasswordDecode extends ForgotPasswordTokenPayload {
+export interface CommonTokenDecode extends CommonTokenPayload {
   iat: number;
   exp: number;
 }

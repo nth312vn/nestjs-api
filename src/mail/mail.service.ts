@@ -23,4 +23,15 @@ export class SendMailService {
       },
     });
   }
+  async sendVerificationEmail(email: string, url: string) {
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Email Verification',
+      template: './verify-email',
+      context: {
+        name: email,
+        url,
+      },
+    });
+  }
 }

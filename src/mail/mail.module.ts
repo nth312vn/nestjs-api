@@ -16,7 +16,7 @@ import { SendMailService } from './mail.service';
           secure: configService.get<boolean>('MAIL_SECURE'),
           auth: {
             user: configService.get<string>('MAIL_USER'),
-            pass: configService.get<string>('MAIL_PASSWORD'), // Replace with your email password
+            pass: configService.get<string>('MAIL_PASSWORD'),
           },
         },
         defaults: {

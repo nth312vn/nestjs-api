@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import {
-  ForgotPasswordDecode,
-  ForgotPasswordTokenPayload,
+  CommonTokenDecode,
+  CommonTokenPayload,
   TokenDecoded,
   TokenPayload,
 } from 'src/auth/interface/auth.interface';
@@ -29,12 +29,21 @@ export class TokenService {
       ),
     });
   }
-  generateForgotPasswordToken(payload: ForgotPasswordTokenPayload) {
+  generateForgotPasswordToken(payload: CommonTokenPayload) {
     return this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>(envKey.FORGOT_PASSWORD_SECRET_KEY),
       expiresIn: this.configService.get<string>(
         envKey.FORGOT_PASSWORD_TOKEN_EXPIRE_TIME,
         defaultConfig.forgotPasswordTokenExpireTime,
+      ),
+    });
+  }
+  generateEmailVerificationToken(payload: CommonTokenPayload) {
+    return this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>(envKey.VERIFY_EMAIL_SECRET_KEY),
+      expiresIn: this.configService.get<string>(
+        envKey.VERIFY_EMAIL_TOKEN_EXPIRE_TIME,
+        defaultConfig.refreshTokenExpireTime,
       ),
     });
   }
@@ -55,11 +64,16 @@ export class TokenService {
       secret: this.configService.get<string>(envKey.REFRESH_TOKEN_SECRET_KEY),
     });
   }
-  async verifyForgotPasswordToken(
-    token: string,
-  ): Promise<ForgotPasswordDecode> {
+  async verifyForgotPasswordToken(token: string): Promise<CommonTokenDecode> {
     return await this.jwtService.verifyAsync(token, {
       secret: this.configService.get<string>(envKey.FORGOT_PASSWORD_SECRET_KEY),
+    });
+  }
+  async verifyEmailVerificationToken(
+    token: string,
+  ): Promise<CommonTokenDecode> {
+    return await this.jwtService.verifyAsync(token, {
+      secret: this.configService.get<string>(envKey.VERIFY_EMAIL_SECRET_KEY),
     });
   }
 }

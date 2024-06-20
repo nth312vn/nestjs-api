@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseService } from 'src/core/base/baseService';
 import { Users } from 'src/entity/user.entity';
@@ -25,5 +25,17 @@ export class UserService extends BaseService<Users> {
   }
   updateUser(entity: Partial<Users>) {
     return this.update(entity);
+  }
+  async ensureEmailIsCorrect(email: string) {
+    const user = await this.getOneByOptions({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('email is invalid');
+    }
+    return user;
   }
 }

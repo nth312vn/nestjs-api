@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { routeName } from 'src/core/config/routeName';
 import {
+  AuthVerificationEmailDto,
   ChangePasswordDto,
   ForgotPasswordDto,
   LoginDto,
@@ -16,6 +17,7 @@ import {
   ReAuthDto,
   RegisterDto,
   ResetPasswordDto,
+  VerifyEmailDto,
 } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { successMessage } from 'src/core/message/successMessage';
@@ -91,5 +93,17 @@ export class AuthController {
     @User() user: UserDecorator,
   ) {
     await this.authService.changePassword(changePasswordDto, user);
+  }
+  @Post('verify-email')
+  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+    await this.authService.verifyEmail(verifyEmailDto);
+    return { message: 'Email has been verified' };
+  }
+  @Post('auth-verification-email')
+  async authVerificationEmail(
+    @Body() verifyEmailDto: AuthVerificationEmailDto,
+  ) {
+    await this.authService.authVerificationEmail(verifyEmailDto.email);
+    return { message: 'Email has been verified' };
   }
 }

@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { UserRoles } from './userRole.entity';
 import { DeviceSession } from './deviceSession.entity';
+import { verifyEmailStatus } from 'src/core/enum/verifyEmailStatus';
 
 @Entity()
 export class Users {
@@ -27,7 +28,18 @@ export class Users {
   date_of_birth: Date;
   @Column({ nullable: true })
   forgot_password_token: string;
-
+  @Column({
+    type: 'enum',
+    enum: [
+      verifyEmailStatus.NOT_VERIFIED,
+      verifyEmailStatus.VERIFIED,
+      verifyEmailStatus.BANNED,
+    ],
+    default: verifyEmailStatus.NOT_VERIFIED,
+  })
+  verify_email_status: verifyEmailStatus;
+  @Column({ nullable: true })
+  verify_email_token: string;
   @OneToMany(() => UserRoles, (UserRoles) => UserRoles.user)
   userRoles: UserRoles[];
   @OneToMany(() => DeviceSession, (deviceSession) => deviceSession.id)

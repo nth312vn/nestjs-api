@@ -53,3 +53,11 @@ export class ChangePasswordDto {
   @IsNotEmpty()
   newPassword: string;
 }
+export class VerifyEmailDto {
+  @IsNotEmpty()
+  token: string;
+}
+export class AuthVerificationEmailDto {
+  @IsNotEmpty()
+  email: string;
+}

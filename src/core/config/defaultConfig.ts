@@ -3,4 +3,5 @@ export const defaultConfig = {
   tokenExpireTime: '30s',
   refreshTokenExpireTime: '12h',
   forgotPasswordTokenExpireTime: '5m',
+  verifyEmailTokenExpireTime: '5m',
 };

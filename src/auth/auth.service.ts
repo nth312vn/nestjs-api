@@ -12,6 +12,7 @@ import {
   LogoutDto,
   RegisterDto,
   ResetPasswordDto,
+  VerifyEmailDto,
 } from './dto/auth.dto';
 import { exceptionMessage } from 'src/core/message/exceptionMessage';
 import { UserService } from 'src/user/user.service';
@@ -24,6 +25,7 @@ import { envKey } from 'src/core/config/envKey';
 import { DataSource } from 'typeorm';
 import { UserDecorator } from 'src/user/interface/user.interface';
 import { SendMailService } from 'src/mail/mail.service';
+import { verifyEmailStatus } from 'src/core/enum/verifyEmailStatus';
 
 @Injectable()
 export class AuthService {
@@ -119,10 +121,7 @@ export class AuthService {
     }
   }
   async forgotPassword(email: string) {
-    const user = await this.userService.getUserInfo({ email });
-    if (!user) {
-      throw new NotFoundException('email is invalid');
-    }
+    const user = await this.userService.ensureEmailIsCorrect(email);
     const token = await this.tokenService.generateForgotPasswordToken({
       email,
     });
@@ -151,8 +150,11 @@ export class AuthService {
       }
       const passwordHashed =
         await this.passwordService.hashPassword(newPassword);
-      user.passwordHashed = passwordHashed;
-      await queryRunner.manager.save(user);
+      await queryRunner.manager.save({
+        ...user,
+        passwordHashed,
+        forgot_password_token: null,
+      });
       await this.deviceSessionService.deleteAllDeviceSessionWithManager(
         queryRunner.manager,
         user.id,
@@ -202,5 +204,43 @@ export class AuthService {
     } finally {
       await queryRunner.release();
     }
+  }
+  async verifyEmail(verifyEmailDto: VerifyEmailDto) {
+    const payload = await this.tokenService.verifyEmailVerificationToken(
+      verifyEmailDto.token,
+    );
+    const user = await this.userService.getUserInfo({
+      email: payload.email,
+    });
+    if (!user) {
+      throw new NotFoundException('email is invalid');
+    }
+    if (user.verify_email_status === verifyEmailStatus.VERIFIED) {
+      throw new BadRequestException('email has been verified');
+    }
+    if (user.verify_email_status === verifyEmailStatus.BANNED) {
+      throw new BadRequestException('email has been banned');
+    }
+    await this.userService.updateUser({
+      id: user.id,
+      verify_email_status: verifyEmailStatus.VERIFIED,
+      verify_email_token: null,
+    });
+  }
+  async authVerificationEmail(email: string) {
+    const user = await this.userService.ensureEmailIsCorrect(email);
+    if (user.verify_email_status === verifyEmailStatus.VERIFIED) {
+      throw new BadRequestException('email has been verified');
+    }
+    const token = await this.tokenService.generateEmailVerificationToken({
+      email,
+    });
+    await this.userService.updateUser({
+      id: user.id,
+      verify_email_token: token,
+    });
+    console.log(token);
+    const url = `${this.configService.get<string>(envKey.FRONTEND_URL)}/verify-email?token=${token}`;
+    await this.sendMailService.sendVerificationEmail(email, url);
   }
 }
