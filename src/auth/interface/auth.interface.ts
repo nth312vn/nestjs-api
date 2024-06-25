@@ -1,8 +1,11 @@
+import { verifyEmailStatus } from 'src/core/enum/verifyEmailStatus';
+
 export interface TokenPayload {
   id: string;
   email: string;
   username: string;
   deviceId: string;
+  verifyStatus: verifyEmailStatus;
 }
 export interface TokenDecoded extends TokenPayload {
   iat: number;

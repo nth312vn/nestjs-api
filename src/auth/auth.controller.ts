@@ -23,7 +23,7 @@ import { AuthService } from './auth.service';
 import { successMessage } from 'src/core/message/successMessage';
 import { Fingerprint, IFingerprint } from 'nestjs-fingerprint';
 import { LoginMetaData } from './interface/auth.interface';
-import { AuthGuard } from './guard/auth.guard';
+import { AuthGuard } from '../guard/auth.guard';
 import { User } from 'src/decorator/user.decorator';
 import { UserDecorator } from 'src/user/interface/user.interface';
 

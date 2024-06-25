@@ -16,4 +16,10 @@ export class UserDto {
   @IsNotEmpty()
   @MaxLength(50)
   lastName: string;
+  dateOfBirth?: string;
+}
+export class UpdateUserDto {
+  firstName?: string;
+  lastName?: string;
+  dateOfBirth?: string;
 }

@@ -81,6 +81,7 @@ export class AuthService {
       username,
       email,
       deviceId: metaData.id,
+      verifyStatus: user.verify_email_status,
     });
     this.logger.log(`User logged in: ${username}`);
     return {
@@ -109,6 +110,7 @@ export class AuthService {
         username: payload.username,
         email: payload.email,
         deviceId: payload.deviceId,
+        verifyStatus: payload.verifyStatus,
       };
       const [accessToken, newRefreshToken] =
         await this.tokenService.generate(tokenPayload);
