@@ -45,7 +45,6 @@ export class AuthService {
     if (isExistUser) {
       throw new ConflictException(exceptionMessage.userAlreadyExist);
     }
-
     const passwordHashed = await this.passwordService.hashPassword(password);
     await this.userService.createUser({
       username,
@@ -105,15 +104,14 @@ export class AuthService {
       if (!session || session.user.id !== payload.id) {
         throw new Error();
       }
-      const tokenPayload = {
-        id: payload.id,
-        username: payload.username,
-        email: payload.email,
-        deviceId: payload.deviceId,
-        verifyStatus: payload.verifyStatus,
-      };
-      const [accessToken, newRefreshToken] =
-        await this.tokenService.generate(tokenPayload);
+      const { id, username, email, deviceId, verifyStatus } = payload;
+      const [accessToken, newRefreshToken] = await this.tokenService.generate({
+        id,
+        username,
+        email,
+        deviceId,
+        verifyStatus,
+      });
       return {
         accessToken,
         refreshToken: newRefreshToken,

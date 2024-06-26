@@ -1,9 +1,3 @@
-import { verifyEmailStatus } from 'src/core/enum/verifyEmailStatus';
+import { TokenPayload } from 'src/auth/interface/auth.interface';
 
-export interface UserDecorator {
-  id: string;
-  email: string;
-  username: string;
-  deviceId: string;
-  verifyStatus: verifyEmailStatus;
-}
+export type UserDecorator = TokenPayload;

@@ -9,6 +9,7 @@ import {
 import { UserRoles } from './userRole.entity';
 import { DeviceSession } from './deviceSession.entity';
 import { verifyEmailStatus } from 'src/core/enum/verifyEmailStatus';
+import { Follow } from './follow.entity';
 
 @Entity()
 export class Users {
@@ -44,6 +45,11 @@ export class Users {
   userRoles: UserRoles[];
   @OneToMany(() => DeviceSession, (deviceSession) => deviceSession.id)
   deviceSession: DeviceSession[];
+  @OneToMany(() => Follow, (follows) => follows.user)
+  followers: Follow[];
+
+  @OneToMany(() => Follow, (follows) => follows.follower)
+  followings: Follow[];
   @CreateDateColumn()
   created_at: Date;
   @UpdateDateColumn()

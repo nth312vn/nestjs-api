@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, MaxLength } from 'class-validator';
+import { IsEmail, IsInt, IsNotEmpty, MaxLength, Min } from 'class-validator';
 
 export class UserDto {
   @IsNotEmpty()
@@ -22,4 +22,20 @@ export class UpdateUserDto {
   firstName?: string;
   lastName?: string;
   dateOfBirth?: string;
+}
+export class GetFollowDto {
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  page: number = 1;
+
+  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
+  pageSize: number;
+}
+export class AddFollowerDto {
+  @IsNotEmpty()
+  @IsInt()
+  followerId: string;
 }
