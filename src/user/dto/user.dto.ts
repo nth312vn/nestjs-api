@@ -1,4 +1,13 @@
-import { IsEmail, IsInt, IsNotEmpty, MaxLength, Min } from 'class-validator';
+import {
+  IsDateString,
+  IsEmail,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class UserDto {
   @IsNotEmpty()
@@ -16,12 +25,21 @@ export class UserDto {
   @IsNotEmpty()
   @MaxLength(50)
   lastName: string;
-  dateOfBirth?: string;
+  @MaxLength(50)
+  @IsDateString()
+  dateOfBirth?: Date;
 }
 export class UpdateUserDto {
-  firstName?: string;
+  @IsOptional()
+  @MaxLength(50)
+  firstName: string;
+  @IsOptional()
+  @MaxLength(50)
   lastName?: string;
-  dateOfBirth?: string;
+  @IsOptional()
+  @MaxLength(50)
+  @IsDateString()
+  date_of_birth: Date;
 }
 export class GetFollowDto {
   @IsNotEmpty()
@@ -31,11 +49,13 @@ export class GetFollowDto {
 
   @IsNotEmpty()
   @IsInt()
+  @Max(100)
   @Min(1)
-  pageSize: number;
+  pageSize: number = 10;
 }
 export class AddFollowerDto {
   @IsNotEmpty()
-  @IsInt()
+  userId: string;
+  @IsNotEmpty()
   followerId: string;
 }

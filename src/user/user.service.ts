@@ -5,6 +5,7 @@ import { Users } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
 import { UserDto } from './dto/user.dto';
 import { Follow } from 'src/entity/follow.entity';
+import { isEmpty } from 'lodash';
 
 @Injectable()
 export class UserService extends BaseService<Users> {
@@ -27,15 +28,15 @@ export class UserService extends BaseService<Users> {
     });
   }
   updateUser(entity: Partial<Users>) {
+    if (isEmpty(entity)) {
+      throw new NotFoundException('there is nothing to update');
+    }
     return this.update(entity);
   }
   async ensureEmailIsCorrect(email: string) {
-    const user = await this.getOneByOptions({
-      where: {
-        email,
-      },
+    const user = await this.getUserInfo({
+      email,
     });
-
     if (!user) {
       throw new NotFoundException('email is invalid');
     }
@@ -43,28 +44,27 @@ export class UserService extends BaseService<Users> {
   }
 
   async getFollowers(userId: string, page: number, pageSize: number) {
-    const user = await this.getOneByOptions({
-      where: {
-        userId,
-      },
+    const user = await this.getUserInfo({
+      id: userId,
     });
     if (!user) {
       throw new NotFoundException('user not found');
     }
     const [followers, total] = await this.followRepository.findAndCount({
       where: { user: { id: userId } },
-      relations: ['followers'],
+      relations: ['follower'],
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
+    console.log(followers);
     return {
       data: followers.map((item) => ({
         id: item.id,
-        email: item.user.email,
-        fistName: item.user.firstName,
-        lastName: item.user.lastName,
-        dateOfBirth: item.user.date_of_birth,
-        username: item.user.username,
+        email: item.follower.email,
+        fistName: item.follower.firstName,
+        lastName: item.follower.lastName,
+        dateOfBirth: item.follower.date_of_birth,
+        username: item.follower.username,
       })),
       total,
       page,
@@ -72,18 +72,14 @@ export class UserService extends BaseService<Users> {
     };
   }
   async addFollower(userId: string, followerId: string) {
-    const user = await this.getOneByOptions({
-      where: {
-        userId,
-      },
+    const user = await this.getUserInfo({
+      id: userId,
     });
     if (!user) {
       throw new NotFoundException('user not found');
     }
-    const follower = await this.getOneByOptions({
-      where: {
-        userId: followerId,
-      },
+    const follower = await this.getUserInfo({
+      id: followerId,
     });
     if (!follower) {
       throw new NotFoundException('follower not found');
@@ -104,17 +100,15 @@ export class UserService extends BaseService<Users> {
     return await this.followRepository.save(newFollower);
   }
   async getFollowing(userId: string, page: number, pageSize: number) {
-    const user = await this.getOneByOptions({
-      where: {
-        userId,
-      },
+    const user = await this.getUserInfo({
+      id: userId,
     });
     if (!user) {
       throw new NotFoundException('user not found');
     }
     const [following, total] = await this.followRepository.findAndCount({
       where: { user: { id: userId } },
-      relations: ['followings'],
+      relations: ['user'],
       skip: (page - 1) * pageSize,
       take: pageSize,
     });

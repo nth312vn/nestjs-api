@@ -99,7 +99,7 @@ export class AuthController {
     await this.authService.verifyEmail(verifyEmailDto);
     return { message: 'Email has been verified' };
   }
-  @Post('auth-verification-email')
+  @Post('send-verification-email')
   async authVerificationEmail(
     @Body() verifyEmailDto: AuthVerificationEmailDto,
   ) {

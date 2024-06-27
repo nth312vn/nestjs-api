@@ -24,6 +24,7 @@ export class UserController {
   async getMe(@User() user: UserDecorator) {
     const userInfo = await this.userService.getUserInfo({ id: user.id });
     return {
+      id: userInfo.id,
       username: userInfo.username,
       email: userInfo.email,
       firstName: userInfo.firstName,
@@ -32,13 +33,13 @@ export class UserController {
     };
   }
   @Patch('me')
-  async updateMe(@User() user: UserDecorator, @Body() userDto: UpdateUserDto) {
+  async updateMe(@Body() userDto: UpdateUserDto) {
     await this.userService.updateUser(userDto);
     return {
       message: 'update success',
     };
   }
-  @Get('followers/:page/:pageSize')
+  @Get('followers')
   async getFollowers(
     @User() user: UserDecorator,
     @Param() param: GetFollowDto,
@@ -46,7 +47,7 @@ export class UserController {
     const { page = 1, pageSize = 10 } = param;
     return await this.userService.getFollowers(user.id, page, pageSize);
   }
-  @Get('following/:page/:pageSize')
+  @Get('following')
   async getFollowing(
     @User() user: UserDecorator,
     @Param() param: GetFollowDto,
@@ -55,9 +56,9 @@ export class UserController {
     return await this.userService.getFollowing(user.id, page, pageSize);
   }
   @HttpCode(HttpStatus.CREATED)
-  @Post('add-follower')
-  async addFollower(@User() user: UserDecorator, @Body() body: AddFollowerDto) {
-    await this.userService.addFollower(user.id, body.followerId);
+  @Post('follow')
+  async addFollower(@Body() body: AddFollowerDto) {
+    await this.userService.addFollower(body.userId, body.followerId);
     return {
       message: 'add follower success',
     };
