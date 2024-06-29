@@ -1,12 +1,9 @@
 import {
   IsDateString,
   IsEmail,
-  IsInt,
   IsNotEmpty,
   IsOptional,
-  Max,
   MaxLength,
-  Min,
 } from 'class-validator';
 
 export class UserDto {
@@ -40,22 +37,4 @@ export class UpdateUserDto {
   @MaxLength(50)
   @IsDateString()
   date_of_birth: Date;
-}
-export class GetFollowDto {
-  @IsNotEmpty()
-  @IsInt()
-  @Min(1)
-  page: number = 1;
-
-  @IsNotEmpty()
-  @IsInt()
-  @Max(100)
-  @Min(1)
-  pageSize: number = 10;
-}
-export class AddFollowerDto {
-  @IsNotEmpty()
-  userId: string;
-  @IsNotEmpty()
-  followerId: string;
 }

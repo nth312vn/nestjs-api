@@ -8,6 +8,7 @@ import { RoleModule } from './role/role.module';
 import { TokenModule } from './token/token.module';
 import { FingerPrintModule } from './fingerPrint/fingerPrint.module';
 import { MailModule } from './mail/mail.module';
+import { FollowModule } from './follow/follow.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MailModule } from './mail/mail.module';
     TokenModule,
     FingerPrintModule,
     MailModule,
+    FollowModule,
   ],
   controllers: [],
   providers: [],
