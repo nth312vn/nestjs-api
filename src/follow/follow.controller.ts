@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -13,7 +14,7 @@ import { VerifyAccountGuard } from 'src/guard/verifyAccount.guard';
 import { FollowService } from './follow.service';
 import { UserDecorator } from 'src/user/interface/user.interface';
 import { User } from 'src/decorator/user.decorator';
-import { AddFollowerDto, GetFollowDto } from './dto/follow.dto';
+import { FollowDto, GetFollowDto } from './dto/follow.dto';
 
 @Controller('follow')
 @UseGuards(AuthGuard, VerifyAccountGuard)
@@ -37,10 +38,17 @@ export class FollowController {
   }
   @HttpCode(HttpStatus.CREATED)
   @Post('follow')
-  async addFollower(@Body() body: AddFollowerDto) {
+  async addFollower(@Body() body: FollowDto) {
     await this.followService.addFollower(body.userId, body.followerId);
     return {
-      message: 'add follower success',
+      message: 'add follow success',
+    };
+  }
+  @Delete('follow')
+  async deleteFollower(@Body() body: FollowDto) {
+    await this.followService.deleteFollow(body.userId, body.followerId);
+    return {
+      message: 'delete follow success',
     };
   }
 }

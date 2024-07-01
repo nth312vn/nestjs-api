@@ -40,7 +40,7 @@ export class FollowService extends BaseService<Follow> {
       pageSize,
     };
   }
-  async addFollower(userId: string, followerId: string) {
+  async ensureUserIdAndFollowerId(userId: string, followerId: string) {
     const user = await this.userService.getUserInfo({
       id: userId,
     });
@@ -53,6 +53,10 @@ export class FollowService extends BaseService<Follow> {
     if (!follower) {
       throw new NotFoundException('follower not found');
     }
+    return { user, follower };
+  }
+  async addFollower(userId: string, followerId: string) {
+    const { user } = await this.ensureUserIdAndFollowerId(userId, followerId);
     const existingFollower = await this.followRepository.findOne({
       where: {
         user: { id: userId },
@@ -94,5 +98,18 @@ export class FollowService extends BaseService<Follow> {
       page,
       pageSize,
     };
+  }
+  async deleteFollow(userId: string, followerId: string) {
+    await this.ensureUserIdAndFollowerId(userId, followerId);
+    const existingFollower = await this.followRepository.findOne({
+      where: {
+        user: { id: userId },
+        follower: { id: followerId },
+      },
+    });
+    if (!existingFollower) {
+      throw new NotFoundException('follow not found');
+    }
+    await this.deleteById(existingFollower.id);
   }
 }

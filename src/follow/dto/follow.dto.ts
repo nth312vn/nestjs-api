@@ -12,7 +12,7 @@ export class GetFollowDto {
   @Min(1)
   pageSize: number = 10;
 }
-export class AddFollowerDto {
+export class FollowDto {
   @IsNotEmpty()
   userId: string;
   @IsNotEmpty()

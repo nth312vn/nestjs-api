@@ -1,8 +1,9 @@
-import { IsEmail, IsNotEmpty, MaxLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, Matches, MaxLength } from 'class-validator';
 
 export class RegisterDto {
   @IsNotEmpty()
   @MaxLength(20)
+  @Matches(/[a-zA-Z0-9_-]{2,20}/)
   username: string;
   @IsNotEmpty()
   @MaxLength(20)
@@ -21,6 +22,7 @@ export class RegisterDto {
 export class LoginDto {
   @IsNotEmpty()
   @MaxLength(20)
+  @Matches(/[a-zA-Z0-9_-]{2,20}/)
   username: string;
   @IsNotEmpty()
   @MaxLength(20)
