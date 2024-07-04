@@ -17,5 +17,9 @@ export default registerAs(
     database: process.env.DATABASE_NAME,
     entities: [Users, Roles, UserRoles, DeviceSession, Follow],
     synchronize: true,
+    extra: {
+      min: 2,
+      max: 10,
+    },
   }),
 );

@@ -9,6 +9,7 @@ import { TokenModule } from './token/token.module';
 import { FingerPrintModule } from './fingerPrint/fingerPrint.module';
 import { MailModule } from './mail/mail.module';
 import { FollowModule } from './follow/follow.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { FollowModule } from './follow/follow.module';
     FingerPrintModule,
     MailModule,
     FollowModule,
+    UploadModule,
   ],
   controllers: [],
   providers: [],
