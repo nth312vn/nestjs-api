@@ -10,6 +10,7 @@ import { FingerPrintModule } from './fingerPrint/fingerPrint.module';
 import { MailModule } from './mail/mail.module';
 import { FollowModule } from './follow/follow.module';
 import { UploadModule } from './upload/upload.module';
+import { MinioClientModule } from './minio/minioClient.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { UploadModule } from './upload/upload.module';
     MailModule,
     FollowModule,
     UploadModule,
+    MinioClientModule,
   ],
   controllers: [],
   providers: [],
