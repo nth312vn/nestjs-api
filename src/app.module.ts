@@ -11,6 +11,7 @@ import { MailModule } from './mail/mail.module';
 import { FollowModule } from './follow/follow.module';
 import { UploadModule } from './upload/upload.module';
 import { MinioClientModule } from './minio/minioClient.module';
+import { ImageModule } from './image/image.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { MinioClientModule } from './minio/minioClient.module';
     FollowModule,
     UploadModule,
     MinioClientModule,
+    ImageModule,
   ],
   controllers: [],
   providers: [],

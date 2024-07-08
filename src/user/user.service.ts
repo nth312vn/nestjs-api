@@ -22,14 +22,6 @@ export class UserService extends BaseService<Users> {
       where: {
         ...params,
       },
-      select: [
-        'id',
-        'username',
-        'email',
-        'firstName',
-        'lastName',
-        'date_of_birth',
-      ],
     });
   }
   updateUser(entity: Partial<Users>) {

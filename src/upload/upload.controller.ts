@@ -3,18 +3,23 @@ import {
   Controller,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from './upload.service';
-
+import { User } from 'src/decorator/user.decorator';
+import { UserDecorator } from 'src/user/interface/user.interface';
+import { AuthGuard } from 'src/guard/auth.guard';
+import { VerifyAccountGuard } from 'src/guard/verifyAccount.guard';
 @Controller('upload')
+@UseGuards(AuthGuard, VerifyAccountGuard)
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
   @Post('avatar')
   @UseInterceptors(
-    FileInterceptor('file', {
+    FileInterceptor('avatar', {
       fileFilter: (req, file, cb) => {
         if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
           return cb(
@@ -27,7 +32,10 @@ export class UploadController {
       limits: { fileSize: 2 * 1024 * 1024 },
     }),
   )
-  uploadAvatar(@UploadedFile() file: Express.Multer.File) {
-    return this.uploadService.handleUploadAvatar(file);
+  uploadAvatar(
+    @UploadedFile() file: Express.Multer.File,
+    @User() user: UserDecorator,
+  ) {
+    return this.uploadService.handleUploadAvatar(file, user);
   }
 }

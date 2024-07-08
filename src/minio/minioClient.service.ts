@@ -23,11 +23,12 @@ export class MinioClientService {
     }
     try {
       await this.get().putObject(bucket, fileName, file);
-      return {
-        url: `${this.configService.get('MINIO_ENDPOINT')}:${this.configService.get('MINIO_PORT')}/${this.configService.get('MINIO_BUCKET')}/${fileName}`,
-      };
+      return fileName;
     } catch (err) {
       throw new BadRequestException(err.message);
     }
+  }
+  async getFileUrl(fileName: string, bucket: string = this.baseBucket) {
+    return await this.get().presignedUrl('GET', bucket, fileName);
   }
 }

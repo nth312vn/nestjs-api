@@ -125,7 +125,6 @@ export class AuthService {
     const token = await this.tokenService.generateForgotPasswordToken({
       email,
     });
-    console.log(token);
     await this.userService.updateUser({
       id: user.id,
       forgot_password_token: token,
@@ -239,7 +238,6 @@ export class AuthService {
       id: user.id,
       verify_email_token: token,
     });
-    console.log(token);
     const url = `${this.configService.get<string>(envKey.FRONTEND_URL)}/verify-email?token=${token}`;
     await this.sendMailService.sendVerificationEmail(email, url);
   }
