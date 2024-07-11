@@ -5,11 +5,13 @@ import { Users } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
 import { UserDto } from './dto/user.dto';
 import { isEmpty } from 'lodash';
+import { MinioClientService } from 'src/minio/minioClient.service';
 
 @Injectable()
 export class UserService extends BaseService<Users> {
   constructor(
     @InjectRepository(Users) private usersRepository: Repository<Users>,
+    private minioClientService: MinioClientService,
   ) {
     super(usersRepository);
   }
@@ -38,5 +40,19 @@ export class UserService extends BaseService<Users> {
       throw new NotFoundException('email is invalid');
     }
     return user;
+  }
+  async updateUserAvatar(id: string, avatarUrl: string) {
+    const user = await this.getUserInfo({ id });
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+    if (user.avatar) {
+      const { bucketName, objectName } =
+        this.minioClientService.extractBucketAndObjectName(user.avatar);
+      console.log(bucketName, objectName);
+      await this.minioClientService.deleteFile(bucketName, objectName);
+    }
+    await this.updateUser({ id, avatar: avatarUrl });
+    return avatarUrl;
   }
 }

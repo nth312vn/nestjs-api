@@ -5,6 +5,7 @@ import { ImageService } from 'src/image/image.service';
 import { MinioClientService } from 'src/minio/minioClient.service';
 import { UserDecorator } from 'src/user/interface/user.interface';
 import { UserService } from 'src/user/user.service';
+import { getFileExtension } from 'src/utils/binary';
 
 @Injectable()
 export class UploadService {
@@ -13,23 +14,27 @@ export class UploadService {
     private userService: UserService,
     private imageService: ImageService,
   ) {}
-  handleUploadFile(file: Express.Multer.File, bucket: string, buffer?: Buffer) {
-    const fileName =
-      crypto.randomBytes(16).toString('hex') + '-' + file.originalname;
+  async handleUploadImage(
+    file: Express.Multer.File,
+    bucket: string,
+    buffer?: Buffer,
+  ) {
+    const ext = getFileExtension(buffer ?? file.buffer);
+    const fileName = `${crypto.randomBytes(16).toString('hex')}.${ext}`;
 
     return this.minioClientService.uploadFile(
       buffer ?? file.buffer,
       bucket,
       fileName,
+      {
+        'Content-Type': 'image/jpeg',
+      },
     );
   }
 
   async handleUploadAvatar(file: Express.Multer.File, user: UserDecorator) {
-    if (!file) {
-      throw new BadRequestException('No file uploaded');
-    }
     const compressBuffer = await this.imageService.compressImage(file.buffer);
-    const url = await this.handleUploadFile(
+    const url = await this.handleUploadImage(
       file,
       minioConfig.avatarBucket,
       compressBuffer,
@@ -38,10 +43,8 @@ export class UploadService {
       url,
       minioConfig.avatarBucket,
     );
-    await this.userService.updateUser({
-      id: user.id,
-      avatar: avatarUrl,
-    });
+
+    await this.userService.updateUserAvatar(user.id, avatarUrl);
     return avatarUrl;
   }
 }

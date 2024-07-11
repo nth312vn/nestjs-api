@@ -25,7 +25,7 @@ export class Users {
   firstName: string;
   @Column({ length: 50 })
   lastName: string;
-  @Column({ nullable: true, length: 100 })
+  @Column({ nullable: true })
   avatar: string;
   @Column({ type: 'date', nullable: true })
   date_of_birth: Date;
