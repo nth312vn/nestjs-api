@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { minioConfig } from 'src/core/config/minio.config';
 import { ImageService } from 'src/image/image.service';

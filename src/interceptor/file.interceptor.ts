@@ -25,9 +25,11 @@ export class FileCountInterceptor implements NestInterceptor {
 }
 
 export function FileCount(expectedCount: number): Type<NestInterceptor> {
-  return class extends FileCountInterceptor {
+  @Injectable()
+  class Interceptor extends FileCountInterceptor {
     constructor() {
       super(expectedCount);
     }
-  };
+  }
+  return Interceptor;
 }

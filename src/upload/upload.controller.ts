@@ -16,7 +16,7 @@ import { FileCount } from 'src/interceptor/file.interceptor';
 @Controller('upload')
 @UseGuards(AuthGuard, VerifyAccountGuard)
 export class UploadController {
-  constructor(private readonly uploadService: UploadService) {}
+  constructor(private uploadService: UploadService) {}
 
   @Post('avatar')
   @UseInterceptors(

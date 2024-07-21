@@ -18,7 +18,6 @@ export default registerAs(
     entities: [Users, Roles, UserRoles, DeviceSession, Follow],
     synchronize: true,
     extra: {
-      min: 2,
       max: 10,
     },
   }),
