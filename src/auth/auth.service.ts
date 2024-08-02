@@ -26,6 +26,7 @@ import { DataSource } from 'typeorm';
 import { UserDecorator } from 'src/user/interface/user.interface';
 import { SendMailService } from 'src/mail/mail.service';
 import { verifyEmailStatus } from 'src/core/enum/verifyEmailStatus';
+import { CaptchaService } from 'src/captcha/captcha.service';
 
 @Injectable()
 export class AuthService {
@@ -37,6 +38,7 @@ export class AuthService {
     private configService: ConfigService,
     private sendMailService: SendMailService,
     private dataSource: DataSource,
+    private captchaService: CaptchaService,
   ) {}
   private logger = new Logger(AuthService.name);
   async register(registerDto: RegisterDto) {
@@ -74,6 +76,14 @@ export class AuthService {
 
     if (!session) {
       await this.deviceSessionService.saveDeviceSession(metaData, user);
+    }
+    if (
+      !this.captchaService.validateCaptcha(
+        loginDto.captchaId,
+        loginDto.captchaValue,
+      )
+    ) {
+      throw new BadRequestException('Invalid captcha');
     }
     const [accessToken, refreshToken] = await this.tokenService.generate({
       id,

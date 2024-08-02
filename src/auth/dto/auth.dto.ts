@@ -34,6 +34,10 @@ export class LoginDto {
   @IsNotEmpty()
   @MaxLength(20)
   password: string;
+  @IsNotEmpty()
+  captchaId: string;
+  @IsNotEmpty()
+  captchaValue: string;
 }
 export class LogoutDto {
   @IsNotEmpty()

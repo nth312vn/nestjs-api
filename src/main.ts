@@ -19,7 +19,6 @@ async function bootstrap() {
       },
       transform: true,
       whitelist: true,
-
       stopAtFirstError: true,
     }),
   );

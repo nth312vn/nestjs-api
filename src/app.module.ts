@@ -12,12 +12,15 @@ import { FollowModule } from './follow/follow.module';
 import { UploadModule } from './upload/upload.module';
 import { MinioClientModule } from './minio/minioClient.module';
 import { ImageModule } from './image/image.module';
+import { RedisConfigModule } from './redisConfig/redisConfig.module';
+import { CaptchaModule } from './captcha/captcha.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    RedisConfigModule,
     TypeOrmModule.forRoot(databaseConfig()),
     UserModule,
     AuthModule,
@@ -29,6 +32,7 @@ import { ImageModule } from './image/image.module';
     MinioClientModule,
     UploadModule,
     ImageModule,
+    CaptchaModule,
   ],
   controllers: [],
   providers: [],
