@@ -1,18 +1,20 @@
 version: '3.8'
 
 services:
-  # mysql:
-  #   image: mysql:latest
-  #   container_name: mysql_container
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: root
-  #     MYSQL_DATABASE: test
-  #     MYSQL_USER: root
-  #     MYSQL_PASSWORD: root
-  #   ports:
-  #     - '3306:3306'
-  #   volumes:
-  #     - mysql_data:/var/lib/mysql
+  mysql:
+    image: mysql:latest
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
   redis:
     image: redis:latest
     container_name: redis_container
@@ -20,33 +22,39 @@ services:
       - '6379:6379'
     volumes:
       - redis_data:/data
+    env_file:
+      - .env
     networks:
-      - redis-network
-  # app:
-  #   container_name: nestjs_app
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - '3000:3000'
-  #   volumes:
-  #     - .:/usr/src/app
-  #     - /usr/src/app/node_modules
-  #   depends_on:
-  #     - mysql
-  #     - redis
-  # minio:
-  #   image: minio/minio
-  #   container_name: minio
-  #   ports:
-  #     - '9000:9000'
-  #     - '9001:9001'
-  #   volumes:
-  #     - ./storage:/data
-  #   environment:
-  #     MINIO_ROOT_USER: ROOTNAME
-  #     MINIO_ROOT_PASSWORD: CHANGEME123
-  #   command: server --console-address ":9001" /data
+      - app-network
+  app:
+    container_name: nestjs_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - app-network
+    depends_on:
+      - mysql
+      - minio
+      - redis
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - ./storage:/data
+    environment:
+      MINIO_ROOT_USER: ROOTNAME
+      MINIO_ROOT_PASSWORD: CHANGEME123
+    command: server --console-address ":9001" /data
   redis-commander:
     image: rediscommander/redis-commander:latest
     environment:
@@ -56,7 +64,7 @@ services:
     ports:
       - '8081:8081'
     networks:
-      - redis-network
+      - app-network
     depends_on:
       - redis
 
@@ -64,5 +72,5 @@ volumes:
   mysql_data:
   redis_data:
 networks:
-  redis-network:
+  app-network:
     driver: bridge

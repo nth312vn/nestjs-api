@@ -9,7 +9,7 @@ import { UserRoles } from 'src/entity/userRole.entity';
 export default registerAs(
   'database',
   (): TypeOrmModuleOptions => ({
-    type: process.env.DATABASE_TYPE as 'mysql',
+    type: (process.env.DATABASE_TYPE as 'mysql') || 'mysql',
     host: process.env.DATABASE_HOST,
     port: +process.env.DATABASE_PORT,
     username: process.env.DATABASE_USERNAME,

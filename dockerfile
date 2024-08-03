@@ -1,50 +1,36 @@
+# Stage 1: Build the application
+FROM node:18-bullseye-slim AS builder
 
-# Building layer
-FROM node:18-alpine as development
-
-# Optional NPM automation (auth) token build argument
-# ARG NPM_TOKEN
-
-# Optionally authenticate NPM registry
-# RUN npm set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
-
+# Set the working directory
 WORKDIR /app
 
-# Copy configuration files
-COPY tsconfig*.json ./
+# Copy the package.json and package-lock.json files
 COPY package*.json ./
 
-# Install dependencies from package-lock.json, see https://docs.npmjs.com/cli/v7/commands/npm-ci
-RUN npm ci
+# Install dependencies
+RUN npm install --legacy-peer-deps
+RUN npm install @css-inline/css-inline-linux-x64-gnu
+RUN npm install --os=linux --cpu=x64 sharp
+# Copy the rest of the application files
+COPY . .
 
-# Copy application sources (.ts, .tsx, js)
-COPY src/ src/
-
-# Build application (produces dist/ folder)
+# Build the application
 RUN npm run build
 
-# Runtime (production) layer
-FROM node:18-alpine as production
+# Stage 2: Create the production image
+FROM node:18-bullseye-slim
 
-# Optional NPM automation (auth) token build argument
-# ARG NPM_TOKEN
-
-# Optionally authenticate NPM registry
-# RUN npm set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
-
+# Set the working directory
 WORKDIR /app
 
-# Copy dependencies files
-COPY package*.json ./
+# Copy the build output and node_modules from the builder stage
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
 
-# Install runtime dependecies (without dev/test dependecies)
-RUN npm ci --omit=dev
-
-# Copy production build
-COPY --from=development /app/dist/ ./dist/
-
-# Expose application port
+# Expose the application port
 EXPOSE 3000
 
-# Start application
-CMD [ "node", "dist/main.js" ]
+# Define the command to run the application
+CMD ["node", "dist/main"]
+
