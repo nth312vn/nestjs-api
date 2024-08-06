@@ -24,7 +24,7 @@ export class CaptchaService {
   }
   async validateCaptcha(id: string, userInput: string): Promise<boolean> {
     const storedCaptcha = await this.cacheManager.get<string>(id);
-    const result = userInput === storedCaptcha;
+    const result = userInput.toLowerCase() === storedCaptcha.toLowerCase();
     if (result) await this.cacheManager.del(id);
     return result;
   }

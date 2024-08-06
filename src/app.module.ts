@@ -14,6 +14,7 @@ import { MinioClientModule } from './minio/minioClient.module';
 import { ImageModule } from './image/image.module';
 import { RedisConfigModule } from './redisConfig/redisConfig.module';
 import { CaptchaModule } from './captcha/captcha.module';
+import { QueueModule } from './queue/queue.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { CaptchaModule } from './captcha/captcha.module';
     UploadModule,
     ImageModule,
     CaptchaModule,
+    QueueModule,
   ],
   controllers: [],
   providers: [],

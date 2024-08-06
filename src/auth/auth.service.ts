@@ -78,10 +78,10 @@ export class AuthService {
       await this.deviceSessionService.saveDeviceSession(metaData, user);
     }
     if (
-      !this.captchaService.validateCaptcha(
+      !(await this.captchaService.validateCaptcha(
         loginDto.captchaId,
         loginDto.captchaValue,
-      )
+      ))
     ) {
       throw new BadRequestException('Invalid captcha');
     }
