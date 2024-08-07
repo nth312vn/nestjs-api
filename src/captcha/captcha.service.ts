@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { CaptchaGenerator } from 'captcha-canvas';
 import { Cache } from 'cache-manager';
 import { generateCaptchaText } from 'src/utils/captcha';
+import { captchaPrefix } from 'src/core/constant/redisPrefix.constant';
 
 @Injectable()
 export class CaptchaService {
@@ -18,12 +19,13 @@ export class CaptchaService {
     captcha.setDecoy({ opacity: 0.5 });
     captcha.setTrace({ color: 'blue' });
     const buffer = await captcha.generate();
-    const id = uuid();
+    const id = `${captchaPrefix}${uuid()}`;
     await this.cacheManager.set(id, captcha.text, 30000);
     return { id, buffer };
   }
   async validateCaptcha(id: string, userInput: string): Promise<boolean> {
-    const storedCaptcha = await this.cacheManager.get<string>(id);
+    const key = `${captchaPrefix}${id}`;
+    const storedCaptcha = await this.cacheManager.get<string>(key);
     const result = userInput.toLowerCase() === storedCaptcha.toLowerCase();
     if (result) await this.cacheManager.del(id);
     return result;

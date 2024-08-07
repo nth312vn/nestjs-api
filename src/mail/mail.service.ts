@@ -15,22 +15,36 @@ export class SendMailService {
   ) {}
   async sendPasswordReset(email: string, token: string) {
     const url = `${this.configService.get<string>(envKey.FRONTEND_URL)}/reset-password?token=${token}`;
-    await this.mailQueue.add(queueProcessName.sendMail, {
-      email,
-      template: 'reset-password',
-      subject: 'Password Reset Request',
-      context: {
-        name: email,
-        url,
+    await this.mailQueue.add(
+      queueProcessName.sendMail,
+      {
+        email,
+        template: 'reset-password',
+        subject: 'Password Reset Request',
+        context: {
+          name: email,
+          url,
+        },
       },
-    });
+      {
+        removeOnComplete: true,
+        removeOnFail: true,
+      },
+    );
   }
   async sendVerificationEmail(email: string, url: string) {
-    await this.mailQueue.add(queueProcessName.sendMail, {
-      email,
-      template: 'verify-email',
-      subject: 'Email Verification',
-      context: { name: email, url },
-    });
+    await this.mailQueue.add(
+      queueProcessName.sendMail,
+      {
+        email,
+        template: 'verify-email',
+        subject: 'Email Verification',
+        context: { name: email, url },
+      },
+      {
+        removeOnComplete: true,
+        removeOnFail: true,
+      },
+    );
   }
 }

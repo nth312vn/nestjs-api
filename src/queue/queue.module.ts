@@ -13,6 +13,7 @@ import { ConfigService } from '@nestjs/config';
           keyPrefix: 'queue',
           defaultJobOptions: {
             removeOnSuccess: true,
+            removeOnFail: true,
           },
         },
       }),
