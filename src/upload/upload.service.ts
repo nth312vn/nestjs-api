@@ -19,7 +19,7 @@ export class UploadService {
     bucket: string,
     buffer?: Buffer,
   ) {
-    const ext = getFileExtension(buffer ?? file.buffer);
+    const ext = getFileExtension(buffer ?? file.buffer, file.originalname);
     const fileName = `${crypto.randomBytes(16).toString('hex')}.${ext}`;
 
     return this.minioClientService.uploadFile(
@@ -46,5 +46,22 @@ export class UploadService {
 
     await this.userService.updateUserAvatar(user.id, avatarUrl);
     return avatarUrl;
+  }
+  async handleUploadVideo(
+    file: Express.Multer.File,
+    bucket: string,
+    host: string,
+  ) {
+    const ext = getFileExtension(file.buffer, file.originalname);
+    const fileName = `${crypto.randomBytes(16).toString('hex')}.${ext}`;
+    const url = await this.minioClientService.uploadFile(
+      file.buffer,
+      bucket,
+      fileName,
+      {
+        'Content-Type': 'video/mp4',
+      },
+    );
+    return `${host}/api/videos/${bucket}/${url}`;
   }
 }

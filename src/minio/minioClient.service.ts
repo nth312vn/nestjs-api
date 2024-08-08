@@ -52,4 +52,10 @@ export class MinioClientService {
 
     return { bucketName, objectName };
   }
+  async getObjectStream(bucketName: string, objectName: string) {
+    return this.get().getObject(bucketName, objectName);
+  }
+  getSizeObject(bucketName: string, objectName: string) {
+    return this.get().statObject(bucketName, objectName);
+  }
 }

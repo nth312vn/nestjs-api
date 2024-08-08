@@ -13,7 +13,7 @@ const magicNumbers = {
   '1f8b': 'gz', // GZIP (gz)
 };
 
-export const getFileExtension = (buffer: Buffer) => {
+export const getFileExtension = (buffer: Buffer, fileName: string) => {
   const magicNumber = buffer.readUInt32BE(0).toString(16);
-  return magicNumbers[magicNumber] || 'unknown';
+  return magicNumbers[magicNumber] || fileName.split('.').pop();
 };

@@ -49,7 +49,6 @@ export class UserService extends BaseService<Users> {
     if (user.avatar) {
       const { bucketName, objectName } =
         this.minioClientService.extractBucketAndObjectName(user.avatar);
-      console.log(bucketName, objectName);
       await this.minioClientService.deleteFile(bucketName, objectName);
     }
     await this.updateUser({ id, avatar: avatarUrl });

@@ -15,6 +15,7 @@ import { ImageModule } from './image/image.module';
 import { RedisConfigModule } from './redisConfig/redisConfig.module';
 import { CaptchaModule } from './captcha/captcha.module';
 import { QueueModule } from './queue/queue.module';
+import { VideoModule } from './video/video.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { QueueModule } from './queue/queue.module';
     ImageModule,
     CaptchaModule,
     QueueModule,
+    VideoModule,
   ],
   controllers: [],
   providers: [],
