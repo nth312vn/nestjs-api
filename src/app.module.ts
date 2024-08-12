@@ -16,6 +16,7 @@ import { RedisConfigModule } from './redisConfig/redisConfig.module';
 import { CaptchaModule } from './captcha/captcha.module';
 import { QueueModule } from './queue/queue.module';
 import { VideoModule } from './video/video.module';
+import { KafkaModule } from './kafka/kafka.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { VideoModule } from './video/video.module';
     CaptchaModule,
     QueueModule,
     VideoModule,
+    KafkaModule,
   ],
   controllers: [],
   providers: [],

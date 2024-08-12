@@ -11,7 +11,6 @@ export class VideoService {
     request: Request,
     response: Response,
   ) {
-    console.log(bucketName, objectName);
     const videoSize = await this.minioClientService.getSizeObject(
       bucketName,
       objectName,

@@ -26,22 +26,22 @@ services:
       - .env
     networks:
       - app-network
-  app:
-    container_name: nestjs_app
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - '3000:3000'
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    networks:
-      - app-network
-    depends_on:
-      - mysql
-      - minio
-      - redis
+    app:
+      container_name: nestjs_app
+      build:
+        context: .
+        dockerfile: Dockerfile
+      ports:
+        - '3000:3000'
+      volumes:
+        - .:/usr/src/app
+        - /usr/src/app/node_modules
+      networks:
+        - app-network
+      depends_on:
+        - mysql
+        - minio
+        - redis
 
   minio:
     image: minio/minio
@@ -67,7 +67,42 @@ services:
       - app-network
     depends_on:
       - redis
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - '2181:2181'
+    networks:
+      - app-network
 
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      - zookeeper
+    ports:
+      - '29092:29092'
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+    networks:
+      - app-network
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    depends_on:
+      - kafka
+    ports:
+      - '8080:8080'
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - app-network
 volumes:
   mysql_data:
   redis_data:
