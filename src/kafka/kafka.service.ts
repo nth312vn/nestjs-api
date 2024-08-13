@@ -1,6 +1,12 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Consumer, EachMessagePayload, Kafka, Producer } from 'kafkajs';
+import {
+  Consumer,
+  EachMessagePayload,
+  Kafka,
+  Message,
+  Producer,
+} from 'kafkajs';
 
 @Injectable()
 export class KafkaService implements OnModuleInit, OnModuleDestroy {
@@ -34,10 +40,10 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     await this.producer.disconnect();
     await this.consumer.disconnect();
   }
-  async produce(topic: string, message: any) {
+  async produce(topic: string, message: Message) {
     await this.producer.send({
       topic,
-      messages: [{ value: message }],
+      messages: [message],
     });
   }
   async consume(topic: string, callback: (message) => void) {

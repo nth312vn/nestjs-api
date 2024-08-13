@@ -1,4 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
+import { Message } from 'kafkajs';
 
 export class ConsumerDto {
   @IsNotEmpty()
@@ -8,5 +9,5 @@ export class ProduceTopicDto {
   @IsNotEmpty()
   topic: string;
   @IsNotEmpty()
-  message: string;
+  message: Message;
 }
