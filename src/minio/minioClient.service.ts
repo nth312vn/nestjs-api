@@ -58,4 +58,35 @@ export class MinioClientService {
   getSizeObject(bucketName: string, objectName: string) {
     return this.get().statObject(bucketName, objectName);
   }
+  async getObject(bucketName: string, objectName: string): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+      this.get().getObject(bucketName, objectName, (err, dataStream) => {
+        if (err) {
+          return reject(err);
+        }
+
+        const chunks: Buffer[] = [];
+        dataStream.on('data', (chunk) => {
+          chunks.push(chunk);
+        });
+
+        dataStream.on('end', () => {
+          resolve(Buffer.concat(chunks));
+        });
+
+        dataStream.on('error', (err) => {
+          reject(err);
+        });
+      });
+    });
+  }
+  async getMultipleObjects(bucketName: string, objectNames: string[]) {
+    const result: Record<string, Buffer> = {};
+    console.log(objectNames);
+    for (const objectName of objectNames) {
+      result[objectName] = await this.getObject(bucketName, objectName);
+    }
+
+    return result;
+  }
 }

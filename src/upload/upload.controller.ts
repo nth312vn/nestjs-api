@@ -13,7 +13,6 @@ import { User } from 'src/decorator/user.decorator';
 import { UserDecorator } from 'src/user/interface/user.interface';
 import { AuthGuard } from 'src/guard/auth.guard';
 import { VerifyAccountGuard } from 'src/guard/verifyAccount.guard';
-import { FileCount } from 'src/interceptor/file.interceptor';
 import { minioConfig } from 'src/core/config/minio.config';
 import { Request } from 'express';
 import * as url from 'url';
@@ -40,13 +39,20 @@ export class UploadController {
       },
       limits: { fileSize: 2 * 1024 * 1024 },
     }),
-    FileCount(1),
   )
   uploadAvatar(
     @UploadedFile() file: Express.Multer.File,
     @User() user: UserDecorator,
+    @Req() req: Request,
   ) {
-    return this.uploadService.handleUploadAvatar(file, user);
+    return this.uploadService.handleUploadAvatar(
+      file,
+      user,
+      url.format({
+        protocol: req.protocol,
+        host: req.get('host'),
+      }),
+    );
   }
 
   @Post('video')

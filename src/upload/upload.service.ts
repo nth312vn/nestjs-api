@@ -32,17 +32,18 @@ export class UploadService {
     );
   }
 
-  async handleUploadAvatar(file: Express.Multer.File, user: UserDecorator) {
+  async handleUploadAvatar(
+    file: Express.Multer.File,
+    user: UserDecorator,
+    host: string,
+  ) {
     const compressBuffer = await this.imageService.compressImage(file.buffer);
     const url = await this.handleUploadImage(
       file,
       minioConfig.avatarBucket,
       compressBuffer,
     );
-    const avatarUrl = await this.minioClientService.getFileUrl(
-      url,
-      minioConfig.avatarBucket,
-    );
+    const avatarUrl = `${host}/api/image/${minioConfig.avatarBucket}/${url}`;
 
     await this.userService.updateUserAvatar(user.id, avatarUrl);
     return avatarUrl;
