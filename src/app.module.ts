@@ -17,6 +17,7 @@ import { CaptchaModule } from './captcha/captcha.module';
 import { QueueModule } from './queue/queue.module';
 import { VideoModule } from './video/video.module';
 import { KafkaModule } from './kafka/kafka.module';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { KafkaModule } from './kafka/kafka.module';
     QueueModule,
     VideoModule,
     KafkaModule,
+    PostsModule,
   ],
   controllers: [],
   providers: [],
