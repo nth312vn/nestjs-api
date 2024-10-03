@@ -21,7 +21,7 @@ export class Media {
     enum: [mediaType.IMAGE, mediaType.VIDEO, mediaType.AUDIO],
   })
   type: mediaType;
-  @ManyToOne(() => Post, (post) => post.media)
+  @ManyToOne(() => Post, (post) => post.media, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'post_id', referencedColumnName: 'id' })
   post: Post;
   @CreateDateColumn()

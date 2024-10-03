@@ -18,6 +18,7 @@ import { QueueModule } from './queue/queue.module';
 import { VideoModule } from './video/video.module';
 import { KafkaModule } from './kafka/kafka.module';
 import { PostsModule } from './posts/posts.module';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { PostsModule } from './posts/posts.module';
     VideoModule,
     KafkaModule,
     PostsModule,
+    MediaModule,
   ],
   controllers: [],
   providers: [],

@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -11,7 +12,6 @@ import { DeviceSession } from './deviceSession.entity';
 import { verifyEmailStatus } from 'src/core/enum/verifyEmailStatus';
 import { Follow } from './follow.entity';
 import { Post } from './post.entity';
-import { Mention } from './mention';
 
 @Entity()
 export class Users {
@@ -54,11 +54,10 @@ export class Users {
 
   @OneToMany(() => Follow, (follows) => follows.follower)
   followings: Follow[];
-
-  @OneToMany(() => Post, (Posts) => Posts.author)
+  @OneToMany(() => Post, (Posts) => Posts.author, { cascade: true })
   posts: Post[];
-  @OneToMany(() => Mention, (mention) => mention.user)
-  mentions: Mention[];
+  @ManyToMany(() => Post, (post) => post.mention)
+  postsMention: Post[];
   @CreateDateColumn()
   created_at: Date;
   @UpdateDateColumn()

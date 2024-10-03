@@ -12,10 +12,10 @@ import { Post } from './post.entity';
 export class PostHashtag {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @ManyToOne(() => Hashtag, (hashtag) => hashtag.id)
+  @ManyToOne(() => Hashtag, (hashtag) => hashtag.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'hashtag_id', referencedColumnName: 'id' })
   hashtag: Hashtag;
-  @ManyToOne(() => Post, (post) => post.id)
+  @ManyToOne(() => Post, (post) => post.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'post_id', referencedColumnName: 'id' })
   post: Post;
   @CreateDateColumn()

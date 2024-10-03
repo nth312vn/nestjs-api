@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -12,13 +13,12 @@ import { PostHashtag } from './postHastag.entity';
 import { Users } from './user.entity';
 import { postType } from 'src/core/enum/postType';
 import { Media } from './media';
-import { Mention } from './mention';
 
 @Entity()
 export class Post {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @Column()
+  @Column({ type: 'mediumtext' })
   content: string;
   @Column({
     type: 'enum',
@@ -37,13 +37,13 @@ export class Post {
   user_view: number;
   @OneToMany(() => PostHashtag, (postHashtag) => postHashtag.post)
   postHashtag: PostHashtag[];
-  @ManyToOne(() => Users, (user) => user.id)
+  @ManyToOne(() => Users, (user) => user.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'author', referencedColumnName: 'id' })
   author: Users;
-  @OneToMany(() => Media, (media) => media.post)
+  @OneToMany(() => Media, (media) => media.post, { cascade: true })
   media: Media[];
-  @OneToMany(() => Mention, (mention) => mention.post)
-  mention: Mention[];
+  @ManyToMany(() => Users, (users) => users.postsMention, { cascade: true })
+  mention: Users[];
   @CreateDateColumn()
   created_at: Date;
   @UpdateDateColumn()

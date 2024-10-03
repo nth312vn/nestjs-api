@@ -1,13 +1,23 @@
-import { IsNotEmpty, MaxLength } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { postType } from 'src/core/enum/postType';
+import { MediaDto } from 'src/media/dto/media.dto';
 
 export class CreatePostDto {
   @IsNotEmpty()
+  @IsEnum(postType)
   type: postType;
   @IsNotEmpty()
-  @MaxLength(500)
+  @IsString()
   content: string;
-  hashtag?: string[];
-  mention?: string[];
-  meida?: string[];
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => MediaDto)
+  media?: MediaDto[];
 }
