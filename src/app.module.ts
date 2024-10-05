@@ -19,6 +19,7 @@ import { VideoModule } from './video/video.module';
 import { KafkaModule } from './kafka/kafka.module';
 import { PostsModule } from './posts/posts.module';
 import { MediaModule } from './media/media.module';
+import { HashtagModule } from './hashtag/hashtag.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { MediaModule } from './media/media.module';
     KafkaModule,
     PostsModule,
     MediaModule,
+    HashtagModule,
   ],
   controllers: [],
   providers: [],

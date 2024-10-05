@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseService } from 'src/core/base/baseService';
 import { Users } from 'src/entity/user.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { UserDto } from './dto/user.dto';
 import { isEmpty } from 'lodash';
 import { MinioClientService } from 'src/minio/minioClient.service';
@@ -53,5 +53,12 @@ export class UserService extends BaseService<Users> {
     }
     await this.updateUser({ id, avatar: avatarUrl });
     return avatarUrl;
+  }
+  async getListMentions(userName: string[]) {
+    return this.getManyByOptions({
+      where: {
+        username: In(userName),
+      },
+    });
   }
 }

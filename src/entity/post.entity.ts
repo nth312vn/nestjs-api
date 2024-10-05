@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -35,7 +36,9 @@ export class Post {
   guest_view: number;
   @Column({ default: 0 })
   user_view: number;
-  @OneToMany(() => PostHashtag, (postHashtag) => postHashtag.post)
+  @OneToMany(() => PostHashtag, (postHashtag) => postHashtag.post, {
+    cascade: true,
+  })
   postHashtag: PostHashtag[];
   @ManyToOne(() => Users, (user) => user.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'author', referencedColumnName: 'id' })
@@ -43,6 +46,17 @@ export class Post {
   @OneToMany(() => Media, (media) => media.post, { cascade: true })
   media: Media[];
   @ManyToMany(() => Users, (users) => users.postsMention, { cascade: true })
+  @JoinTable({
+    name: 'mention',
+    joinColumn: {
+      name: 'postId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id',
+    },
+  })
   mention: Users[];
   @CreateDateColumn()
   created_at: Date;

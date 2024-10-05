@@ -3,6 +3,7 @@ import {
   IsArray,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -16,6 +17,7 @@ export class CreatePostDto {
   @IsNotEmpty()
   @IsString()
   content: string;
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => MediaDto)

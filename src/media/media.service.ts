@@ -22,6 +22,9 @@ export class MediaService extends BaseService<Media> {
   async createMedia(media: Media) {
     return await this.create(media);
   }
+  createMediaEntities(medias: Partial<Media>[]) {
+    return this.mediaRepository.create(medias);
+  }
   async updateMedia(media: Partial<MediaDto>) {
     return await this.update(media);
   }

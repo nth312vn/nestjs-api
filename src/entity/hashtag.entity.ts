@@ -16,7 +16,9 @@ export class Hashtag {
   id: string;
   @Column({ length: 100 })
   name: string;
-  @OneToMany(() => PostHashtag, (postHashtag) => postHashtag.hashtag)
+  @OneToMany(() => PostHashtag, (postHashtag) => postHashtag.hashtag, {
+    cascade: true,
+  })
   postHashtag: PostHashtag[];
   @CreateDateColumn()
   created_at: Date;

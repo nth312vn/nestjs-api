@@ -4,7 +4,6 @@ import { DeviceSession } from 'src/entity/deviceSession.entity';
 import { Follow } from 'src/entity/follow.entity';
 import { Hashtag } from 'src/entity/hashtag.entity';
 import { Media } from 'src/entity/media';
-import { Mention } from 'src/entity/mention';
 import { Post } from 'src/entity/post.entity';
 import { PostHashtag } from 'src/entity/postHastag.entity';
 import { Roles } from 'src/entity/role.entity';
@@ -27,7 +26,6 @@ export default registerAs(
       DeviceSession,
       Follow,
       Post,
-      Mention,
       Media,
       Hashtag,
       PostHashtag,
