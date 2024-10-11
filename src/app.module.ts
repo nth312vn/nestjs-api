@@ -20,6 +20,7 @@ import { KafkaModule } from './kafka/kafka.module';
 import { PostsModule } from './posts/posts.module';
 import { MediaModule } from './media/media.module';
 import { HashtagModule } from './hashtag/hashtag.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { HashtagModule } from './hashtag/hashtag.module';
     PostsModule,
     MediaModule,
     HashtagModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [],

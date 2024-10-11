@@ -18,8 +18,8 @@ export class Follow {
 
   @ManyToOne(() => Users, (user) => user.followings)
   follower: Users;
-  @Column({ type: 'date', default: () => 'CURRENT_TIMESTAMP' })
-  followed_at: Date;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  followed_at: string;
 
   @CreateDateColumn()
   created_at: Date;

@@ -5,10 +5,11 @@ services:
     image: mysql:latest
     container_name: mysql_container
     environment:
-      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: test
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      # MYSQL_USER: root
+      # MYSQL_PASSWORD: root
     ports:
       - '3306:3306'
     volumes:
@@ -26,22 +27,22 @@ services:
       - .env
     networks:
       - app-network
-    app:
-      container_name: nestjs_app
-      build:
-        context: .
-        dockerfile: Dockerfile
-      ports:
-        - '3000:3000'
-      volumes:
-        - .:/usr/src/app
-        - /usr/src/app/node_modules
-      networks:
-        - app-network
-      depends_on:
-        - mysql
-        - minio
-        - redis
+  # app:
+  #   container_name: nestjs_app
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - '3000:3000'
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   networks:
+  #     - app-network
+  #   depends_on:
+  #     - mysql
+  #     - minio
+  #     - redis
 
   minio:
     image: minio/minio
@@ -101,6 +102,19 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - app-network
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - '8082:80'
+    depends_on:
+      - mysql
     networks:
       - app-network
 volumes:
