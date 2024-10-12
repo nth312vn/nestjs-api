@@ -2,11 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { PostHashtag } from './postHastag.entity';
+import { Post } from './post.entity';
 
 @Entity({
   name: 'hashtag',
@@ -16,10 +17,22 @@ export class Hashtag {
   id: string;
   @Column({ length: 100 })
   name: string;
-  @OneToMany(() => PostHashtag, (postHashtag) => postHashtag.hashtag, {
+  @ManyToMany(() => Post, (post) => post.hashtags, {
     cascade: true,
   })
-  postHashtag: PostHashtag[];
+  @JoinTable({
+    name: 'post_hashtag',
+    joinColumn: {
+      name: 'postId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'hashtagId',
+      referencedColumnName: 'id',
+    },
+  })
+  posts: Post[];
+
   @CreateDateColumn()
   created_at: Date;
   @UpdateDateColumn()

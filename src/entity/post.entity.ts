@@ -10,10 +10,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { PostHashtag } from './postHastag.entity';
 import { Users } from './user.entity';
 import { postType } from 'src/core/enum/postType';
 import { Media } from './media';
+import { Hashtag } from './hashtag.entity';
 
 @Entity()
 export class Post {
@@ -36,10 +36,8 @@ export class Post {
   guest_view: number;
   @Column({ default: 0 })
   user_view: number;
-  @OneToMany(() => PostHashtag, (postHashtag) => postHashtag.post, {
-    cascade: true,
-  })
-  postHashtag: PostHashtag[];
+  @ManyToMany(() => Hashtag, (hashtag) => hashtag.posts)
+  hashtags: Hashtag[];
   @ManyToOne(() => Users, (user) => user.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'author', referencedColumnName: 'id' })
   author: Users;

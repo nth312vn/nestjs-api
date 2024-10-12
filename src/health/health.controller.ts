@@ -1,6 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
 import {
-  DiskHealthIndicator,
   HealthCheck,
   HealthCheckService,
   MemoryHealthIndicator,
@@ -10,7 +9,6 @@ import {
 export class HealthController {
   constructor(
     private health: HealthCheckService,
-    private disk: DiskHealthIndicator,
     private memory: MemoryHealthIndicator,
   ) {}
 
@@ -18,8 +16,10 @@ export class HealthController {
   @HealthCheck()
   check() {
     return this.health.check([
-      async () =>
-        this.disk.checkStorage('disk', { thresholdPercent: 0.9, path: '/' }),
+      // async () =>
+      //   this.disk.checkStorage('disk', {
+      //     thresholdPercent: 0.9,
+      //   }),
       async () =>
         this.memory.checkHeap('memory_heap', 300 * 1024 * 1024 * 1024),
       async () => this.memory.checkRSS('memory_rss', 300 * 1024 * 1024 * 1024),

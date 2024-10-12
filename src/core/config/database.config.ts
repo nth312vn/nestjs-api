@@ -5,7 +5,6 @@ import { Follow } from 'src/entity/follow.entity';
 import { Hashtag } from 'src/entity/hashtag.entity';
 import { Media } from 'src/entity/media';
 import { Post } from 'src/entity/post.entity';
-import { PostHashtag } from 'src/entity/postHastag.entity';
 import { Roles } from 'src/entity/role.entity';
 import { Users } from 'src/entity/user.entity';
 import { UserRoles } from 'src/entity/userRole.entity';
@@ -28,7 +27,6 @@ export default registerAs(
       Post,
       Media,
       Hashtag,
-      PostHashtag,
     ],
     synchronize: true,
     extra: {

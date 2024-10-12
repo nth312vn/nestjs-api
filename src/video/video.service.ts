@@ -24,6 +24,7 @@ export class VideoService {
     const headers = {
       'Content-Range': `bytes ${start}-${end}/${videoSize}`,
       'Accept-Ranges': 'bytes',
+
       'Content-Length': contentLength,
       'Content-Type': 'video/mp4',
     };

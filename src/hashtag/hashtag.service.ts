@@ -19,7 +19,7 @@ export class HashtagService extends BaseService<Hashtag> {
       where: { name: tag },
     });
     if (!hashtag) {
-      return await this.createHashtag(tag);
+      return this.createHashtag(tag);
     }
     return hashtag;
   }

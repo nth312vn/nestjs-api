@@ -4,21 +4,19 @@ import { Post } from 'src/entity/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreatePostDto, UpdatePostDto } from './dto/posts.dto';
-import { PostHashTagService } from 'src/hashtag/postHashTag.service';
-import { HashtagService } from 'src/hashtag/hashtag.service';
 import { UserService } from 'src/user/user.service';
 import { MediaService } from 'src/media/media.service';
 import { isEmpty } from 'class-validator';
 import { UserDecorator } from 'src/user/interface/user.interface';
+import { HashtagService } from 'src/hashtag/hashtag.service';
 
 @Injectable()
 export class PostService extends BaseService<Post> {
   constructor(
     @InjectRepository(Post) private postRepository: Repository<Post>,
-    private postHashTagService: PostHashTagService,
-    private hashtagService: HashtagService,
     private userService: UserService,
     private mediaService: MediaService,
+    private hashtagService: HashtagService,
   ) {
     super(postRepository);
   }
@@ -34,14 +32,12 @@ export class PostService extends BaseService<Post> {
       author,
     });
     if (!isEmpty(hashtags)) {
-      const postHashtags = await Promise.all(
+      const hashTags = await Promise.all(
         hashtags.map(async (hashtag) => {
-          const hashTag =
-            await this.hashtagService.findOneOrInsertHashTag(hashtag);
-          return this.postHashTagService.createPostHashtag(post, hashTag);
+          return this.hashtagService.findOneOrInsertHashTag(hashtag);
         }),
       );
-      post.postHashtag = postHashtags;
+      post.hashtags = hashTags;
     }
     if (!isEmpty(mentions)) {
       const mentionEntities = await this.userService.getListMentions(mentions);
@@ -71,14 +67,14 @@ export class PostService extends BaseService<Post> {
     post.content = content || post.content;
     post.postType = type || post.postType;
     if (!isEmpty(hashtags)) {
-      const postHashtags = await Promise.all(
+      const hashTags = await Promise.all(
         hashtags.map(async (hashtag) => {
           const hashTag =
             await this.hashtagService.findOneOrInsertHashTag(hashtag);
-          return this.postHashTagService.createPostHashtag(post, hashTag);
+          return hashTag;
         }),
       );
-      post.postHashtag = postHashtags;
+      post.hashtags = hashTags;
     }
     if (!isEmpty(mentions)) {
       const mentionEntities = await this.userService.getListMentions(mentions);
