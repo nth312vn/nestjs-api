@@ -87,11 +87,35 @@ export class PostService extends BaseService<Post> {
     await this.update(post);
     return 'update success';
   }
-  getPostDetail(id: string) {
-    return this.getOneByOptions({
+  async getPostDetail(id: string) {
+    const post = await this.getOneByOptions({
       where: { id },
-      relations: ['postHashtag', 'mention', 'media', 'author'],
+      relations: ['hashtags', 'mention', 'media', 'author'],
     });
+    if (!post) {
+      throw new NotFoundException('post not found');
+    }
+    return {
+      id: post.id,
+      type: post.postType,
+      content: post.content,
+      author: {
+        id: post.author.id,
+        name: post.author.username,
+      },
+      postHashtag: post.hashtags.map((tag) => ({
+        id: tag.id,
+        name: tag.name,
+      })),
+      mention: post.mention.map((m) => ({
+        id: m.id,
+        name: m.username,
+      })),
+      media: post.media.map((m) => ({
+        id: m.id,
+        url: m.url,
+      })),
+    };
   }
   async getListPostsByAuthorId(
     user: UserDecorator,
@@ -105,8 +129,32 @@ export class PostService extends BaseService<Post> {
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
+    if (!posts || posts.length === 0) {
+      throw new NotFoundException('post not found');
+    }
+    const transformedPosts = posts.map((post) => ({
+      id: post.id,
+      type: post.postType,
+      content: post.content,
+      author: {
+        id: post.author.id,
+        name: post.author.username,
+      },
+      postHashtag: post.hashtags.map((tag) => ({
+        id: tag.id,
+        name: tag.name,
+      })),
+      mention: post.mention.map((m) => ({
+        id: m.id,
+        name: m.username,
+      })),
+      media: post.media.map((m) => ({
+        id: m.id,
+        url: m.url,
+      })),
+    }));
     return {
-      data: posts,
+      data: transformedPosts,
       total,
       page,
       pageSize,
