@@ -54,9 +54,9 @@ export class Users {
 
   @OneToMany(() => Follow, (follows) => follows.follower)
   followings: Follow[];
-  @OneToMany(() => Post, (Posts) => Posts.author, { cascade: true })
+  @OneToMany(() => Post, (Posts) => Posts.author, { onDelete: 'CASCADE' })
   posts: Post[];
-  @ManyToMany(() => Post, (post) => post.mention)
+  @ManyToMany(() => Post, (post) => post.mention, { onDelete: 'CASCADE' })
   postsMention: Post[];
   @CreateDateColumn()
   created_at: Date;

@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   Max,
+  MaxLength,
   Min,
   ValidateNested,
 } from 'class-validator';
@@ -44,14 +45,27 @@ export class UpdatePostDto {
   type?: postType;
 }
 export class PagingPostsDto {
-  @IsNotEmpty()
   @IsInt()
+  @Type(() => Number)
   @Min(1)
   page: number = 1;
 
-  @IsNotEmpty()
   @IsInt()
+  @Type(() => Number)
   @Max(100)
   @Min(1)
   pageSize: number = 10;
+}
+export class SearchPostsDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  author: string;
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  content: string;
+  @IsOptional()
+  @IsEnum(postType)
+  postType: postType;
 }

@@ -2,13 +2,19 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { BaseService } from 'src/core/base/baseService';
 import { Post } from 'src/entity/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CreatePostDto, UpdatePostDto } from './dto/posts.dto';
+import { ObjectLiteral, Repository } from 'typeorm';
+import {
+  CreatePostDto,
+  PagingPostsDto,
+  SearchPostsDto,
+  UpdatePostDto,
+} from './dto/posts.dto';
 import { UserService } from 'src/user/user.service';
 import { MediaService } from 'src/media/media.service';
 import { isEmpty } from 'class-validator';
 import { UserDecorator } from 'src/user/interface/user.interface';
 import { HashtagService } from 'src/hashtag/hashtag.service';
+import { postType } from 'src/core/enum/postType';
 
 @Injectable()
 export class PostService extends BaseService<Post> {
@@ -124,8 +130,8 @@ export class PostService extends BaseService<Post> {
   ) {
     const author = await this.ensureAuthorExist(user.id);
     const [posts, total] = await this.postRepository.findAndCount({
-      where: { author },
-      relations: ['postHashtag', 'mention', 'media', 'author'],
+      where: { author: { id: author.id } },
+      relations: ['hashtags', 'mention', 'media', 'author'],
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
@@ -160,11 +166,16 @@ export class PostService extends BaseService<Post> {
       pageSize,
     };
   }
-  deletePost(id: string, user: UserDecorator) {
-    return this.postRepository.delete({
+  async deletePost(id: string, user: UserDecorator) {
+    console.log(id);
+    const result = await this.postRepository.delete({
       id,
       author: { id: user.id },
     });
+    if (result.affected === 0) {
+      throw new NotFoundException(`Entity with id ${id} not found`);
+    }
+    return 'delete success';
   }
   async ensureAuthorExist(id: string) {
     const user = await this.userService.getOneByOptions({ where: { id } });
@@ -172,6 +183,43 @@ export class PostService extends BaseService<Post> {
       throw new NotFoundException('user not found');
     }
     return user;
+  }
+  async searchPosts(query: SearchPostsDto, pagination: PagingPostsDto) {
+    const { page, pageSize } = pagination;
+    const queyBuilder = this.postRepository.createQueryBuilder('post');
+    const conditions: Record<
+      keyof SearchPostsDto,
+      (value: string) => [string, ObjectLiteral]
+    > = {
+      author: (value: string) => ['post.author = :author', { author: value }],
+      content: (value: string) => [
+        'post.content LIKE :content',
+        { content: `%${value}%` },
+      ],
+      postType: (value: postType) => [
+        'post.postType = :postType',
+        { postType: value },
+      ],
+    };
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && key in conditions) {
+        const [condition, params] =
+          conditions[key as keyof typeof conditions](value);
+        queyBuilder.andWhere(condition, params);
+      }
+    });
+
+    const totalCount = await queyBuilder.getCount();
+    queyBuilder.skip((page - 1) * pageSize).take(pageSize);
+    const posts = await queyBuilder.getMany();
+
+    return {
+      posts,
+      totalCount,
+      page,
+      pageSize,
+      totalPages: Math.ceil(totalCount / pageSize),
+    };
   }
   private extractHashtags(content: string): string[] {
     return content.match(/#\w+/g)?.map((tag) => tag.slice(1)) || [];

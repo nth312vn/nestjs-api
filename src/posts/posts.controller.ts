@@ -32,11 +32,11 @@ export class PostsController {
     return this.postService.updatePosts(updatePostDto, id, user);
   }
   @Get('detail/:id')
-  getPostDetail(@Param() id: string) {
+  getPostDetail(@Param('id') id: string) {
     return this.postService.getPostDetail(id);
   }
   @Get('list')
-  getPostList(@User() user: UserDecorator, @Query() query: PagingPostsDto) {
+  getPostList(@Query() query: PagingPostsDto, @User() user: UserDecorator) {
     return this.postService.getListPostsByAuthorId(
       user,
       query.page,
@@ -44,7 +44,7 @@ export class PostsController {
     );
   }
   @Delete('delete/:id')
-  deletePost(@Param() id: string, @User() user: UserDecorator) {
+  deletePost(@Param('id') id: string, @User() user: UserDecorator) {
     return this.postService.deletePost(id, user);
   }
 }

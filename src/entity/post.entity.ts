@@ -36,12 +36,14 @@ export class Post {
   guest_view: number;
   @Column({ default: 0 })
   user_view: number;
-  @ManyToMany(() => Hashtag, (hashtag) => hashtag.posts)
+  @ManyToMany(() => Hashtag, (hashtag) => hashtag.posts, {
+    onDelete: 'CASCADE',
+  })
   hashtags: Hashtag[];
-  @ManyToOne(() => Users, (user) => user.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Users, (user) => user.id, { cascade: true })
   @JoinColumn({ name: 'author', referencedColumnName: 'id' })
   author: Users;
-  @OneToMany(() => Media, (media) => media.post, { cascade: true })
+  @OneToMany(() => Media, (media) => media.post, { onDelete: 'CASCADE' })
   media: Media[];
   @ManyToMany(() => Users, (users) => users.postsMention, { cascade: true })
   @JoinTable({
