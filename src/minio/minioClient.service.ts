@@ -82,7 +82,6 @@ export class MinioClientService {
   }
   async getMultipleObjects(bucketName: string, objectNames: string[]) {
     const result: Record<string, Buffer> = {};
-    console.log(objectNames);
     for (const objectName of objectNames) {
       result[objectName] = await this.getObject(bucketName, objectName);
     }

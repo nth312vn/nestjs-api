@@ -3,12 +3,7 @@ import { BaseService } from 'src/core/base/baseService';
 import { Post } from 'src/entity/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, ObjectLiteral, Repository } from 'typeorm';
-import {
-  CreatePostDto,
-  PagingPostsDto,
-  SearchPostsDto,
-  UpdatePostDto,
-} from './dto/posts.dto';
+import { CreatePostDto, SearchPostsDto, UpdatePostDto } from './dto/posts.dto';
 import { UserService } from 'src/user/user.service';
 import { MediaService } from 'src/media/media.service';
 import { isEmpty } from 'class-validator';
@@ -107,7 +102,6 @@ export class PostService extends BaseService<Post> {
         media,
         manager,
       );
-      console.log(post);
       await manager.save(post);
       await queryRunner.commitTransaction();
       return 'update success';
@@ -192,7 +186,6 @@ export class PostService extends BaseService<Post> {
     };
   }
   async deletePost(id: string, user: UserDecorator) {
-    console.log(id);
     const result = await this.postRepository.delete({
       id,
       author: { id: user.id },
@@ -209,11 +202,12 @@ export class PostService extends BaseService<Post> {
     }
     return user;
   }
-  async searchPosts(query: SearchPostsDto, pagination: PagingPostsDto) {
-    const { page, pageSize } = pagination;
+
+  async searchPosts(query: SearchPostsDto) {
+    const { page, pageSize } = query;
     const queyBuilder = this.postRepository.createQueryBuilder('post');
     const conditions: Record<
-      keyof SearchPostsDto,
+      keyof Omit<SearchPostsDto, 'page' | 'pageSize'>,
       (value: string) => [string, ObjectLiteral]
     > = {
       author: (value: string) => ['post.author = :author', { author: value }],

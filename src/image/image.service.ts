@@ -22,7 +22,6 @@ export class ImageService {
   }
   async getMultipleImages(bucketName: string, objectNames: string[]) {
     try {
-      console.log(objectNames);
       const images = await this.minioClientService.getMultipleObjects(
         bucketName,
         objectNames,

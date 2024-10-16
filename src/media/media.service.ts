@@ -52,7 +52,6 @@ export class MediaService extends BaseService<Media> {
         updatedMedia.push(newMediaEntity);
       }
     });
-    console.log(updatedMedia);
     mediaToRemove.push(...existingMediaMap.values());
     if (mediaToRemove.length > 0) {
       await manager.remove(mediaToRemove);

@@ -56,7 +56,7 @@ export class PagingPostsDto {
   @Min(1)
   pageSize: number = 10;
 }
-export class SearchPostsDto {
+export class SearchPostsDto extends PagingPostsDto {
   @IsOptional()
   @IsString()
   @MaxLength(100)

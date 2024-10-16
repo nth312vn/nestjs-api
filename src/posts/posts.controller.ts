@@ -9,7 +9,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CreatePostDto, PagingPostsDto, UpdatePostDto } from './dto/posts.dto';
+import {
+  CreatePostDto,
+  PagingPostsDto,
+  SearchPostsDto,
+  UpdatePostDto,
+} from './dto/posts.dto';
 import { PostService } from './posts.service';
 import { AuthGuard } from 'src/guard/auth.guard';
 import { VerifyAccountGuard } from 'src/guard/verifyAccount.guard';
@@ -46,5 +51,9 @@ export class PostsController {
   @Delete('delete/:id')
   deletePost(@Param('id') id: string, @User() user: UserDecorator) {
     return this.postService.deletePost(id, user);
+  }
+  @Get('search')
+  searchPosts(@Query() query: SearchPostsDto) {
+    return this.postService.searchPosts(query);
   }
 }
