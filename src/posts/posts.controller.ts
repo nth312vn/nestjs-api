@@ -23,9 +23,9 @@ export class PostsController {
   createPost(@Body() createPostDto: CreatePostDto) {
     return this.postService.createPost(createPostDto);
   }
-  @Patch('update')
+  @Patch('update/:id')
   updatePost(
-    @Param() id: string,
+    @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
     @User() user: UserDecorator,
   ) {

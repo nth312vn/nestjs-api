@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { BaseService } from 'src/core/base/baseService';
 import { Post } from 'src/entity/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ObjectLiteral, Repository } from 'typeorm';
+import { DataSource, ObjectLiteral, Repository } from 'typeorm';
 import {
   CreatePostDto,
   PagingPostsDto,
@@ -23,6 +23,7 @@ export class PostService extends BaseService<Post> {
     private userService: UserService,
     private mediaService: MediaService,
     private hashtagService: HashtagService,
+    private dataSource: DataSource,
   ) {
     super(postRepository);
   }
@@ -30,31 +31,47 @@ export class PostService extends BaseService<Post> {
     const { content, media, type, userId } = createPostDto;
     const hashtags = this.extractHashtags(content);
     const mentions = this.extractMentions(content);
-    const author = await this.ensureAuthorExist(userId);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const { manager } = queryRunner;
+      const author = await this.ensureAuthorExist(userId);
 
-    const post = this.postRepository.create({
-      content,
-      postType: type,
-      author,
-    });
-    if (!isEmpty(hashtags)) {
-      const hashTags = await Promise.all(
-        hashtags.map(async (hashtag) => {
-          return this.hashtagService.findOneOrInsertHashTag(hashtag);
-        }),
-      );
-      post.hashtags = hashTags;
+      const post = this.postRepository.create({
+        content,
+        postType: type,
+        author,
+      });
+      if (!isEmpty(hashtags)) {
+        const hashTags = await Promise.all(
+          hashtags.map(async (hashtag) => {
+            return this.hashtagService.findOneOrInsertHashTag(hashtag, manager);
+          }),
+        );
+        post.hashtags = hashTags;
+      }
+      if (!isEmpty(mentions)) {
+        const mentionEntities =
+          await this.userService.getListMentions(mentions);
+        post.mention = mentionEntities;
+      }
+      if (!isEmpty(media)) {
+        const mediaEntities = await this.mediaService.createMediaEntities(
+          media,
+          manager,
+        );
+        post.media = mediaEntities;
+      }
+      await manager.save(post);
+      await queryRunner.commitTransaction();
+      return 'created success';
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      throw new NotFoundException('something went wrong');
+    } finally {
+      await queryRunner.release();
     }
-    if (!isEmpty(mentions)) {
-      const mentionEntities = await this.userService.getListMentions(mentions);
-      post.mention = mentionEntities;
-    }
-    if (media) {
-      const mediaEntities = this.mediaService.createMediaEntities(media);
-      post.media = mediaEntities;
-    }
-    await this.create(post);
-    return 'created success';
   }
 
   async updatePosts(
@@ -65,33 +82,41 @@ export class PostService extends BaseService<Post> {
     const { content, media, type } = updatePostDto;
     const hashtags = this.extractHashtags(content);
     const mentions = this.extractMentions(content);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const { manager } = queryRunner;
+      const post = await this.getOneByOptions({
+        where: { id, author: { id: user.id } },
+        relations: ['hashtags', 'mention', 'media', 'author'],
+      });
+      post.content = content || post.content;
+      post.postType = type || post.postType;
 
-    const post = await this.getOneByOptions({
-      where: { id, author: { id: user.id } },
-      relations: ['postHashtag', 'mention', 'media', 'author'],
-    });
-    post.content = content || post.content;
-    post.postType = type || post.postType;
-    if (!isEmpty(hashtags)) {
       const hashTags = await Promise.all(
         hashtags.map(async (hashtag) => {
-          const hashTag =
-            await this.hashtagService.findOneOrInsertHashTag(hashtag);
-          return hashTag;
+          return this.hashtagService.findOneOrInsertHashTag(hashtag, manager);
         }),
       );
       post.hashtags = hashTags;
-    }
-    if (!isEmpty(mentions)) {
       const mentionEntities = await this.userService.getListMentions(mentions);
       post.mention = mentionEntities;
+      post.media = await this.mediaService.updatePostMedias(
+        post,
+        media,
+        manager,
+      );
+      console.log(post);
+      await manager.save(post);
+      await queryRunner.commitTransaction();
+      return 'update success';
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      throw new NotFoundException('something went wrong', e.message);
+    } finally {
+      await queryRunner.release();
     }
-    if (media) {
-      const mediaEntities = this.mediaService.createMediaEntities(media);
-      post.media = mediaEntities;
-    }
-    await this.update(post);
-    return 'update success';
   }
   async getPostDetail(id: string) {
     const post = await this.getOneByOptions({
